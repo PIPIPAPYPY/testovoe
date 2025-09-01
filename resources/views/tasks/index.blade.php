@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление задачами</title>
+@extends('layouts.app')
+
+@section('title', 'Управление задачами')
+
+@section('content')
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -109,9 +108,7 @@
         .method-put { border-left: 4px solid #ffc107; }
         .method-delete { border-left: 4px solid #dc3545; }
     </style>
-</head>
-<body>
-<div class="container">
+<div class="container" style="background:white;padding:30px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1)">
     <h1>📋 Управление задачами</h1>
 
     <div class="api-info">
@@ -155,11 +152,10 @@
         </p>
     @endif
 
-    <div style="margin-top: 30px; text-align: center;">
-        <p style="color: #666;">
-            💡 Для тестирования API используйте <a href="/test_api.html" style="color: #007bff;">тестовую страницу</a>
-        </p>
+    <div style="margin-top:16px;text-align:center;color:#6b7280">
+        <small>Показаны последние задачи</small>
     </div>
+
+    
 </div>
-</body>
-</html>
+@endsection
