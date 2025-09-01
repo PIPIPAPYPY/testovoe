@@ -119,9 +119,76 @@
 <div class="container">
     <h1>🧪 Тестирование API задач</h1>
 
+    <div class="api-section">
+        <h3>🔐 Аутентификация</h3>
+        <div id="authStatus" class="response" style="display: none;"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+            <div>
+                <h4>Регистрация</h4>
+                <div class="form-group">
+                    <label for="regName">Имя</label>
+                    <input type="text" id="regName" placeholder="Ваше имя">
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Пароль</label>
+                    <input type="password" id="regPassword" placeholder="******">
+                </div>
+                <button onclick="register()">Зарегистрироваться</button>
+            </div>
+            <div>
+                <h4>Вход</h4>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Пароль</label>
+                    <input type="password" id="loginPassword" placeholder="******">
+                </div>
+                <button onclick="login()">Войти</button>
+                <button onclick="logout()" style="background:#6b7280;margin-left:8px;">Выйти</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Получить все задачи -->
     <div class="api-section">
         <h3>📋 Получить все задачи</h3>
+        <div class="form-group">
+            <label>Фильтры:</label>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;">
+                <select id="filterStatus">
+                    <option value="">Статус: любой</option>
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="done">Done</option>
+                </select>
+                <input type="date" id="createdFrom" placeholder="Создано c">
+                <input type="date" id="createdTo" placeholder="Создано по">
+                <input type="date" id="deadlineFrom" placeholder="Дедлайн c">
+                <input type="date" id="deadlineTo" placeholder="Дедлайн по">
+                <select id="filterPriority">
+                    <option value="">Приоритет: любой</option>
+                    <option value="1">1 — высокий</option>
+                    <option value="2">2 — средний</option>
+                    <option value="3">3 — низкий</option>
+                </select>
+                <select id="sortBy">
+                    <option value="created_at">Сортировать по: Дате создания</option>
+                    <option value="status">Статусу</option>
+                    <option value="deadline">Дедлайну</option>
+                    <option value="priority">Приоритету</option>
+                </select>
+                <select id="sortDir">
+                    <option value="desc">По убыванию</option>
+                    <option value="asc">По возрастанию</option>
+                </select>
+            </div>
+        </div>
         <button onclick="getTasks()">Получить задачи</button>
         <div id="getTasksResponse" class="response" style="display: none;"></div>
     </div>
@@ -143,6 +210,18 @@
                 <option value="todo">To Do</option>
                 <option value="in_progress">In Progress</option>
                 <option value="done">Done</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="createDeadline">Дедлайн:</label>
+            <input type="datetime-local" id="createDeadline">
+        </div>
+        <div class="form-group">
+            <label for="createPriority">Приоритет (1-3):</label>
+            <select id="createPriority">
+                <option value="1">1 — высокий</option>
+                <option value="2">2 — средний</option>
+                <option value="3" selected>3 — низкий</option>
             </select>
         </div>
         <button onclick="createTask()">Создать задачу</button>
@@ -183,6 +262,19 @@
                 <option value="done">Done</option>
             </select>
         </div>
+        <div class="form-group">
+            <label for="updateDeadline">Дедлайн:</label>
+            <input type="datetime-local" id="updateDeadline">
+        </div>
+        <div class="form-group">
+            <label for="updatePriority">Приоритет (1-3):</label>
+            <select id="updatePriority">
+                <option value="">(не менять)</option>
+                <option value="1">1 — высокий</option>
+                <option value="2">2 — средний</option>
+                <option value="3">3 — низкий</option>
+            </select>
+        </div>
         <button onclick="updateTask()">Обновить задачу</button>
         <div id="updateTaskResponse" class="response" style="display: none;"></div>
     </div>
@@ -201,6 +293,38 @@
 
 <script>
     const API_BASE = '/api/tasks';
+    const API_AUTH = '/api';
+
+    function getToken() {
+        return localStorage.getItem('token') || '';
+    }
+
+    function setToken(token) {
+        if (token) {
+            localStorage.setItem('token', token);
+        } else {
+            localStorage.removeItem('token');
+        }
+        renderAuthStatus();
+    }
+
+    function authHeaders() {
+        const token = getToken();
+        return token ? { 'Authorization': `Bearer ${token}` } : {};
+    }
+
+    function renderAuthStatus() {
+        const token = getToken();
+        const el = document.getElementById('authStatus');
+        el.style.display = 'block';
+        if (token) {
+            el.className = 'response success';
+            el.textContent = 'Авторизован. Токен сохранён в localStorage.';
+        } else {
+            el.className = 'response error';
+            el.textContent = 'Не авторизован. Войдите или зарегистрируйтесь.';
+        }
+    }
 
     function showResponse(elementId, data, isError = false) {
         const element = document.getElementById(elementId);
@@ -211,7 +335,31 @@
 
     async function getTasks() {
         try {
-            const response = await fetch(API_BASE);
+            const params = new URLSearchParams();
+            const status = document.getElementById('filterStatus').value;
+            const createdFrom = document.getElementById('createdFrom').value;
+            const createdTo = document.getElementById('createdTo').value;
+            const deadlineFrom = document.getElementById('deadlineFrom').value;
+            const deadlineTo = document.getElementById('deadlineTo').value;
+            const priority = document.getElementById('filterPriority').value;
+            const sortBy = document.getElementById('sortBy').value;
+            const sortDir = document.getElementById('sortDir').value;
+
+            if (status) params.set('status', status);
+            if (createdFrom) params.set('created_from', createdFrom);
+            if (createdTo) params.set('created_to', createdTo);
+            if (deadlineFrom) params.set('deadline_from', deadlineFrom);
+            if (deadlineTo) params.set('deadline_to', deadlineTo);
+            if (priority) params.set('priority', priority);
+            if (sortBy) params.set('sort_by', sortBy);
+            if (sortDir) params.set('sort_dir', sortDir);
+
+            const response = await fetch(`${API_BASE}?${params.toString()}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    ...authHeaders(),
+                }
+            });
             const data = await response.json();
             showResponse('getTasksResponse', data, !response.ok);
         } catch (error) {
@@ -235,9 +383,15 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    ...authHeaders(),
                 },
-                body: JSON.stringify({ title, description, status })
+                body: JSON.stringify({
+                    title,
+                    description,
+                    status,
+                    deadline: document.getElementById('createDeadline').value || null,
+                    priority: parseInt(document.getElementById('createPriority').value, 10)
+                })
             });
             const data = await response.json();
             showResponse('createTaskResponse', data, !response.ok);
@@ -247,6 +401,8 @@
                 document.getElementById('createTitle').value = '';
                 document.getElementById('createDescription').value = '';
                 document.getElementById('createStatus').value = 'todo';
+                document.getElementById('createDeadline').value = '';
+                document.getElementById('createPriority').value = '3';
             }
         } catch (error) {
             showResponse('createTaskResponse', { error: error.message }, true);
@@ -261,7 +417,12 @@
         }
 
         try {
-            const response = await fetch(`${API_BASE}/${id}`);
+            const response = await fetch(`${API_BASE}/${id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    ...authHeaders(),
+                }
+            });
             const data = await response.json();
             showResponse('getTaskResponse', data, !response.ok);
         } catch (error) {
@@ -291,7 +452,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    ...authHeaders(),
                 },
                 body: JSON.stringify(updateData)
             });
@@ -318,7 +479,7 @@
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    ...authHeaders(),
                 }
             });
             const data = await response.json();
@@ -328,9 +489,58 @@
         }
     }
 
+    async function register() {
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        try {
+            const res = await fetch(`${API_AUTH}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            });
+            const data = await res.json();
+            if (res.ok) setToken(data.token);
+            showResponse('authStatus', data, !res.ok);
+        } catch (e) {
+            showResponse('authStatus', { error: e.message }, true);
+        }
+    }
+
+    async function login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        try {
+            const res = await fetch(`${API_AUTH}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (res.ok) setToken(data.token);
+            showResponse('authStatus', data, !res.ok);
+        } catch (e) {
+            showResponse('authStatus', { error: e.message }, true);
+        }
+    }
+
+    async function logout() {
+        try {
+            const res = await fetch(`${API_AUTH}/logout`, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', ...authHeaders() }
+            });
+            const data = await res.json();
+            setToken('');
+            showResponse('authStatus', data, !res.ok);
+        } catch (e) {
+            showResponse('authStatus', { error: e.message }, true);
+        }
+    }
+
     // Автоматически загружаем задачи при загрузке страницы
     window.onload = function() {
-        getTasks();
+        renderAuthStatus();
     };
 </script>
 </body>

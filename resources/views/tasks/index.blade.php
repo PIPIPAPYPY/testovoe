@@ -1,9 +1,8 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление задачами</title>
+@extends('layouts.app')
+
+@section('title', 'Управление задачами')
+
+@section('content')
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -109,9 +108,7 @@
         .method-put { border-left: 4px solid #ffc107; }
         .method-delete { border-left: 4px solid #dc3545; }
     </style>
-</head>
-<body>
-<div class="container">
+
     <h1>📋 Управление задачами</h1>
 
     <div class="api-info">
@@ -125,9 +122,9 @@
         </div>
     </div>
 
-    <h2>📝 Список задач ({{ count($tasks) }})</h2>
+    <h2>📝 Список задач ({{ $tasks->total() }})</h2>
 
-    @if(count($tasks) > 0)
+    @if($tasks->count() > 0)
         <div class="task-grid">
             @foreach($tasks as $task)
                 @php
@@ -155,11 +152,11 @@
         </p>
     @endif
 
+    <div style="margin-top: 20px;">{{ $tasks->withQueryString()->links() }}</div>
+
     <div style="margin-top: 30px; text-align: center;">
         <p style="color: #666;">
             💡 Для тестирования API используйте <a href="/test_api.html" style="color: #007bff;">тестовую страницу</a>
         </p>
     </div>
-</div>
-</body>
-</html>
+@endsection
