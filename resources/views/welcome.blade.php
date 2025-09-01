@@ -1,9 +1,10 @@
-<!DOCTYPE html>
-<html lang="ru">
-    <head>
+@extends('layouts.app')
+
+@section('title', 'Task Management API - Laravel')
+
+@section('content')
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Management API - Laravel</title>
     <style>
         * {
             margin: 0;
@@ -235,8 +236,6 @@
             }
         }
             </style>
-    </head>
-<body>
     <div class="container">
         <div class="header">
             <h1>🚀 Task Management API</h1>
@@ -255,7 +254,7 @@
                 <span class="card-icon">🧪</span>
                 <h2>Тестирование API</h2>
                 <p>Интерактивная страница для тестирования всех API endpoints с возможностью создания, редактирования и удаления задач.</p>
-                <a href="/test_api.html" class="btn btn-secondary">Тестировать API</a>
+                
             </div>
 
             <div class="card">
@@ -315,5 +314,4 @@
             <p>Построено с ❤️ на <a href="https://laravel.com" target="_blank">Laravel</a></p>
         </div>
     </div>
-    </body>
-</html>
+@endsection
