@@ -4,7 +4,5 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 
-
-
-// Маршруты для задач (публичные, без аутентификации)
+// Публичные маршруты для задач (без аутентификации)
 Route::apiResource('tasks', TaskController::class);

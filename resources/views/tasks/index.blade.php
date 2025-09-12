@@ -204,7 +204,6 @@
         <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057;">🔍 Фильтр задач</h3>
         
         <form method="GET" action="{{ route('tasks.index') }}">
-            <!-- DEBUG: Форма отправляется на: {{ route('tasks.index') }} -->
             <div class="filter-row">
                 <div class="filter-group">
                     <label for="status">Статус:</label>
@@ -261,13 +260,6 @@
     </div>
 
     <h2>📝 Список задач ({{ count($tasks) }})</h2>
-    
-    <div style="background: #f8f9fa; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 12px; color: #6c757d;">
-        <strong>🔍 DEBUG:</strong> 
-        Текущий URL: {{ url()->current() }} | 
-        Маршрут tasks.index: {{ route('tasks.index') }} | 
-        Параметры: {{ json_encode(request()->all()) }}
-    </div>
     
     @if(request('status') || request('search'))
         <div style="background: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
