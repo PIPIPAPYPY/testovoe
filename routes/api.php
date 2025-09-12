@@ -6,9 +6,5 @@ use App\Http\Controllers\TaskController;
 
 
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-// Маршруты для задач
+// Маршруты для задач (публичные, без аутентификации)
 Route::apiResource('tasks', TaskController::class);
