@@ -108,11 +108,145 @@
         .method-post { border-left: 4px solid #007bff; }
         .method-put { border-left: 4px solid #ffc107; }
         .method-delete { border-left: 4px solid #dc3545; }
+        
+        /* Стили для фильтра */
+        .filter-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 1px solid #dee2e6;
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .filter-input:focus {
+            outline: 0;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .filter-select {
+            min-width: 150px;
+        }
+        .filter-search {
+            min-width: 250px;
+        }
+        .filter-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.15s ease-in-out;
+        }
+        .filter-btn:hover {
+            background: #0056b3;
+        }
+        .filter-btn-secondary {
+            background: #6c757d;
+        }
+        .filter-btn-secondary:hover {
+            background: #545b62;
+        }
+        .status-badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .status-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status-badge.active {
+            box-shadow: 0 0 0 2px #007bff;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>📋 Управление задачами</h1>
+
+    <!-- Фильтр задач -->
+    <div class="filter-section">
+        <h3 style="margin-top: 0; margin-bottom: 15px; color: #495057;">🔍 Фильтр задач</h3>
+        
+        <form method="GET" action="{{ route('tasks.index') }}">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="status">Статус:</label>
+                    <select name="status" id="status" class="filter-input filter-select">
+                        <option value="">Все задачи</option>
+                        <option value="todo" {{ request('status') == 'todo' ? 'selected' : '' }}>К выполнению</option>
+                        <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>В работе</option>
+                        <option value="done" {{ request('status') == 'done' ? 'selected' : '' }}>Выполнено</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="search">Поиск:</label>
+                    <input type="text" name="search" id="search" class="filter-input filter-search" 
+                           placeholder="Поиск по названию или описанию..." 
+                           value="{{ request('search') }}">
+                </div>
+                
+                <div class="filter-group" style="margin-top: 20px;">
+                    <button type="submit" class="filter-btn">Применить фильтр</button>
+                    <a href="{{ route('tasks.index') }}" class="filter-btn filter-btn-secondary" style="text-decoration: none; margin-left: 5px;">Сбросить</a>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Быстрые фильтры -->
+        <div class="status-badges">
+            <span style="color: #6c757d; font-size: 12px; margin-right: 10px;">Быстрые фильтры:</span>
+            <a href="{{ route('tasks.index') }}" class="status-badge {{ !request('status') ? 'active' : '' }}" 
+               style="background-color: #e9ecef; color: #495057;">
+                Все ({{ $statusCounts['all'] }})
+            </a>
+            <a href="{{ route('tasks.index', ['status' => 'todo']) }}" class="status-badge {{ request('status') == 'todo' ? 'active' : '' }} status-todo">
+                К выполнению ({{ $statusCounts['todo'] }})
+            </a>
+            <a href="{{ route('tasks.index', ['status' => 'in_progress']) }}" class="status-badge {{ request('status') == 'in_progress' ? 'active' : '' }} status-in_progress">
+                В работе ({{ $statusCounts['in_progress'] }})
+            </a>
+            <a href="{{ route('tasks.index', ['status' => 'done']) }}" class="status-badge {{ request('status') == 'done' ? 'active' : '' }} status-done">
+                Выполнено ({{ $statusCounts['done'] }})
+            </a>
+        </div>
+    </div>
 
     <div class="api-info">
         <h3>🔗 API Endpoints</h3>
@@ -126,6 +260,22 @@
     </div>
 
     <h2>📝 Список задач ({{ count($tasks) }})</h2>
+    
+    @if(request('status') || request('search'))
+        <div style="background: #d1ecf1; color: #0c5460; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
+            <strong>🔍 Активные фильтры:</strong>
+            @if(request('status'))
+                <span style="background: white; padding: 2px 8px; border-radius: 12px; margin-left: 5px;">
+                    Статус: {{ match(request('status')) { 'todo' => 'К выполнению', 'in_progress' => 'В работе', 'done' => 'Выполнено', default => request('status') } }}
+                </span>
+            @endif
+            @if(request('search'))
+                <span style="background: white; padding: 2px 8px; border-radius: 12px; margin-left: 5px;">
+                    Поиск: "{{ request('search') }}"
+                </span>
+            @endif
+        </div>
+    @endif
 
     @if(count($tasks) > 0)
         <div class="task-grid">
