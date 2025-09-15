@@ -6,17 +6,21 @@ use App\Models\Task;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Сидер для создания тестовых задач
+ * 
+ * Заполняет базу данных примерами задач для тестирования
+ */
 class TaskSeeder extends Seeder
 {
     /**
-     * Заполнить базу данных тестовыми данными
+     * Выполнить заполнение базы данных тестовыми задачами
+     * @return void
      */
     public function run(): void
     {
-        // Очищаем таблицу задач
         Task::truncate();
 
-        // Создаем тестовые задачи
         $tasks = [
             [
                 'title' => 'Изучить Laravel',

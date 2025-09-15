@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Management API - Laravel</title>
@@ -27,6 +27,7 @@
         .header {
             text-align: center;
             margin-bottom: 60px;
+            position: relative;
         }
 
         .header h1 {
@@ -43,6 +44,47 @@
             max-width: 600px;
             margin: 0 auto;
             line-height: 1.6;
+        }
+
+        .auth-buttons {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-btn {
+            background: white;
+            color: #667eea;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: #f8f9fa;
+        }
+
+        .logout-btn {
+            background: #dc3545 !important;
+            color: white !important;
+        }
+
+        .logout-btn:hover {
+            background: #c82333 !important;
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 600;
+            margin-right: 10px;
         }
 
         .main-content {
@@ -221,24 +263,33 @@
             .header h1 {
                 font-size: 2.5rem;
             }
-            
+
             .header p {
                 font-size: 1.1rem;
             }
-            
+
             .card {
                 padding: 30px;
             }
-            
+
             .features {
                 padding: 30px;
             }
         }
-            </style>
-    </head>
+    </style>
+</head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="auth-buttons" id="authButtons">
+                <a href="/login" class="auth-btn">Войти</a>
+                <a href="/register" class="auth-btn">Регистрация</a>
+            </div>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span class="user-name" id="userName">Загрузка...</span>
+                <a href="/tasks" class="auth-btn">Мои задачи</a>
+                <button onclick="logout()" class="auth-btn logout-btn">Выйти</button>
+            </div>
             <h1>🚀 Task Management API</h1>
             <p>Полнофункциональное REST API для управления задачами, построенное на Laravel с современным веб-интерфейсом</p>
         </div>
@@ -247,7 +298,7 @@
             <div class="card">
                 <span class="card-icon">📋</span>
                 <h2>Просмотр задач</h2>
-                <p>Красивый веб-интерфейс для просмотра всех задач с фильтрацией по статусу и удобной навигацией.</p>
+                <p>Красивый веб-интерфейс для просмотра всех задач с фильтрацией по статусу, приоритету и дедлайну.</p>
                 <a href="/tasks" class="btn btn-primary">Открыть список задач</a>
             </div>
 
@@ -255,14 +306,7 @@
                 <span class="card-icon">🧪</span>
                 <h2>Тестирование API</h2>
                 <p>Интерактивная страница для тестирования всех API endpoints с возможностью создания, редактирования и удаления задач.</p>
-                <a href="/test_api.html" class="btn btn-secondary">Тестировать API</a>
-            </div>
-
-            <div class="card">
-                <span class="card-icon">📚</span>
-                <h2>Документация</h2>
-                <p>Подробная документация по использованию API с примерами запросов и ответов для всех операций.</p>
-                <a href="#api-docs" class="btn btn-secondary">Смотреть документацию</a>
+                <a href="/api-test" class="btn btn-primary">Тестировать API</a>
             </div>
         </div>
 
@@ -271,8 +315,8 @@
             <div class="features-grid">
                 <div class="feature">
                     <span class="feature-icon">🔐</span>
-                    <h3>Валидация данных</h3>
-                    <p>Автоматическая проверка и валидация всех входящих данных с подробными сообщениями об ошибках</p>
+                    <h3>Аутентификация</h3>
+                    <p>Безопасная регистрация и авторизация пользователей с токенами Laravel Sanctum</p>
                 </div>
                 <div class="feature">
                     <span class="feature-icon">⚡</span>
@@ -286,34 +330,152 @@
                 </div>
                 <div class="feature">
                     <span class="feature-icon">📊</span>
-                    <h3>Статистика</h3>
-                    <p>Отслеживание статусов задач и статистика по их выполнению</p>
+                    <h3>Фильтрация и сортировка</h3>
+                    <p>Продвинутая фильтрация по статусу, приоритету, дедлайну и сортировка задач</p>
                 </div>
                 <div class="feature">
-                    <span class="feature-icon">🔧</span>
-                    <h3>Гибкость</h3>
-                    <p>Легкое расширение функциональности и добавление новых возможностей</p>
+                    <span class="feature-icon">⏰</span>
+                    <h3>Дедлайны и приоритеты</h3>
+                    <p>Управление дедлайнами задач и система приоритетов для эффективного планирования</p>
                 </div>
                 <div class="feature">
                     <span class="feature-icon">🛡️</span>
                     <h3>Надежность</h3>
                     <p>Обработка ошибок, логирование и стабильная работа системы</p>
                 </div>
+                <div class="feature">
+                    <span class="feature-icon">🚀</span>
+                    <h3>Высокая производительность</h3>
+                    <p>Оптимизированные запросы, кэширование и составные индексы для быстрой работы</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🔒</span>
+                    <h3>Продвинутая безопасность</h3>
+                    <p>Sanctum токены, CSRF защита, rate limiting и валидация данных</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🐳</span>
+                    <h3>Docker контейнеризация</h3>
+                    <p>Готовая Docker среда с PostgreSQL, Nginx и PHP-FPM для легкого развертывания</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">💾</span>
+                    <h3>Умное кэширование</h3>
+                    <p>Автоматическое кэширование статистики и очистка при изменениях данных</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🔍</span>
+                    <h3>Продвинутый поиск</h3>
+                    <p>Полнотекстовый поиск по задачам с оптимизированными запросами и индексами</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">📈</span>
+                    <h3>Статистика в реальном времени</h3>
+                    <p>Мгновенная статистика по статусам задач с кэшированием результатов</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">⚡</span>
+                    <h3>Сжатие контента</h3>
+                    <p>Автоматическое Gzip сжатие для уменьшения трафика и ускорения загрузки</p>
+                </div>
+                <div class="feature">
+                    <span class="feature-icon">🛠️</span>
+                    <h3>Оптимизированная архитектура</h3>
+                    <p>Middleware сжатия, оптимизированные запросы и современные практики Laravel</p>
+                </div>
             </div>
 
             <div class="api-endpoints" id="api-docs">
                 <h3>🔗 API Endpoints</h3>
-                <div class="endpoint get">GET /api/tasks - Получить список всех задач</div>
+
+                <div class="endpoint post">POST /api/auth/register - Регистрация пользователя</div>
+                <div class="endpoint post">POST /api/auth/login - Авторизация пользователя</div>
+                <div class="endpoint post">POST /api/auth/logout - Выход пользователя (только с токеном Sanctum)</div>
+                <div class="endpoint get">GET /api/tasks - Получить список задач (с фильтрацией)</div>
                 <div class="endpoint post">POST /api/tasks - Создать новую задачу</div>
-                <div class="endpoint get">GET /api/tasks/{id} - Получить конкретную задачу</div>
-                <div class="endpoint put">PUT /api/tasks/{id} - Обновить задачу</div>
-                <div class="endpoint delete">DELETE /api/tasks/{id} - Удалить задачу</div>
+                <div class="endpoint get">GET /api/tasks/{task} - Получить конкретную задачу</div>
+                <div class="endpoint put">PUT /api/tasks/{task} - Обновить задачу</div>
+                <div class="endpoint delete">DELETE /api/tasks/{task} - Удалить задачу</div>
             </div>
+
         </div>
 
         <div class="footer">
             <p>Построено с ❤️ на <a href="https://laravel.com" target="_blank">Laravel</a></p>
         </div>
     </div>
-    </body>
+
+    <script>
+        // Проверяем авторизацию при загрузке страницы
+        window.onload = function() {
+            checkAuth();
+        };
+
+        function getToken() {
+            return localStorage.getItem('token') || '';
+        }
+
+        function authHeaders() {
+            const token = getToken();
+            return token ? { 'Authorization': `Bearer ${token}` } : {};
+        }
+
+        async function checkAuth() {
+            const token = getToken();
+
+            if (!token) {
+                showAuthButtons();
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/user', {
+                    headers: {
+                        'Accept': 'application/json',
+                        ...authHeaders(),
+                    }
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    showUserInfo(user.name);
+                } else {
+                    localStorage.removeItem('token');
+                    showAuthButtons();
+                }
+            } catch (error) {
+                localStorage.removeItem('token');
+                showAuthButtons();
+            }
+        }
+
+        function showAuthButtons() {
+            document.getElementById('authButtons').style.display = 'flex';
+            document.getElementById('userInfo').style.display = 'none';
+        }
+
+        function showUserInfo(userName) {
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('authButtons').style.display = 'none';
+            document.getElementById('userInfo').style.display = 'flex';
+        }
+
+        async function logout() {
+            try {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        ...authHeaders(),
+                    }
+                });
+            } catch (error) {
+                console.error('Ошибка при выходе:', error);
+            }
+
+            localStorage.removeItem('token');
+            showAuthButtons();
+        }
+    </script>
+</body>
 </html>

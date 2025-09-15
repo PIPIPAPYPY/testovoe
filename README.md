@@ -1,61 +1,217 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management API - Laravel
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Полнофункциональное веб-приложение для управления задачами, построенное на Laravel с современным REST API и красивым веб-интерфейсом.
 
-## About Laravel
+## Описание
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Это приложение позволяет пользователям создавать, редактировать и отслеживать свои задачи. Система включает в себя как веб-интерфейс для удобной работы в браузере, так и REST API для интеграции с другими приложениями.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Основные возможности:
+- 🔐 **Безопасная аутентификация** через Laravel Sanctum (API токены) и веб-сессии
+- 📋 **Управление задачами** с поддержкой статусов, приоритетов и дедлайнов
+- 🔍 **Продвинутый поиск** по названию и описанию задач
+- 📊 **Статистика в реальном времени** с кэшированием результатов
+- ⚡ **Высокая производительность** благодаря оптимизированным запросам и индексам
+- 🐳 **Docker контейнеризация** для легкого развертывания
+- 🛡️ **Продвинутая безопасность** с rate limiting и валидацией данных
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Установка
 
-## Learning Laravel
+### Требования
+- PHP 8.2+
+- Composer
+- PostgreSQL 13+
+- Docker (опционально)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Локальная установка
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. **Клонируйте репозиторий:**
+```bash
+git clone <repository-url>
+cd task-management-api
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. **Установите зависимости:**
+```bash
+composer install
+```
 
-## Laravel Sponsors
+3. **Настройте окружение:**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+4. **Настройте базу данных в .env:**
+```env
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:udeN35N0RQOntEzo353qb5HkrcVq0BiOHBvYWj+qbmU=
+APP_DEBUG=true
+APP_URL=http://localhost
 
-### Premium Partners
+DB_CONNECTION=pgsql
+DB_HOST=pgsql
+DB_PORT=5427
+DB_DATABASE=db
+DB_USERNAME=user
+DB_PASSWORD=password  
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+5. **Выполните миграции:**
+```bash
+php artisan migrate
+```
 
-## Contributing
+6. **Заполните базу тестовыми данными (опционально):**
+```bash
+php artisan db:seed --class=TestUserSeeder
+php artisan db:seed --class=TaskSeeder
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+7. **Запустите сервер:**
+```bash
+php artisan serve
+```
 
-## Code of Conduct
+Приложение будет доступно по адресу `http://localhost:8000`
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Docker установка
 
-## Security Vulnerabilities
+1. **Перейдите в папку docker_s:**
+```bash
+cd docker_s
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. **Настройте переменные окружения в .env:**
+```env
+PROJECT_NAME=task-management
+NGINX_PORT=92
 
-## License
+DB_CONNECTION=pgsql
+DB_HOST=pgsql
+DB_PORT=5427
+DB_DATABASE=db
+DB_USERNAME=user
+DB_PASSWORD=password
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=base64:udeN35N0RQOntEzo353qb5HkrcVq0BiOHBvYWj+qbmU=
+APP_DEBUG=true
+APP_URL=http://localhost
+```
+
+3. **Запустите контейнеры:**
+```bash
+docker-compose up -d
+```
+
+Приложение будет доступно по адресу `http://localhost:92`
+
+## Использование
+
+### Веб-интерфейс
+- Откройте `http://localhost:8000` (или `http://localhost:92` для Docker)
+- Зарегистрируйтесь или войдите в систему
+- Используйте веб-интерфейс для управления задачами
+
+### API
+- Все API endpoints доступны по адресу `/api/`
+- Для авторизации используйте токены Sanctum
+- Подробная документация доступна на странице `/api-test`
+
+## Маршруты / Эндпоинты
+
+### Веб-маршруты (routes/web.php)
+
+| Маршрут | Метод | Описание | Доступ |
+|---------|-------|----------|--------|
+| `/` | GET | Главная страница с информацией о проекте | Все пользователи |
+| `/register` | GET | Форма регистрации нового пользователя | Анонимные пользователи |
+| `/login` | GET | Форма входа в систему | Анонимные пользователи |
+| `/login` | POST | Обработка входа пользователя | Анонимные пользователи |
+| `/logout` | POST | Выход из системы | Авторизованные пользователи |
+| `/tasks` | GET | Список задач с фильтрацией и пагинацией | Авторизованные пользователи |
+| `/api-test` | GET | Интерактивная страница тестирования API | Все пользователи |
+
+### API маршруты (routes/api.php)
+
+| Маршрут | Метод | Описание | Доступ |
+|---------|-------|----------|--------|
+| `/api/auth/register` | POST | Регистрация через API с получением токена | Анонимные пользователи |
+| `/api/auth/login` | POST | Авторизация через API с получением токена | Анонимные пользователи |
+| `/api/auth/logout` | POST | Выход из API (удаление токенов) | Авторизованные пользователи |
+| `/api/user` | GET | Получение данных текущего пользователя | Авторизованные пользователи |
+| `/api/tasks` | GET | Список задач с фильтрацией и сортировкой | Авторизованные пользователи |
+| `/api/tasks` | POST | Создание новой задачи | Авторизованные пользователи |
+| `/api/tasks/{id}` | GET | Получение конкретной задачи | Авторизованные пользователи |
+| `/api/tasks/{id}` | PUT | Обновление существующей задачи | Авторизованные пользователи |
+| `/api/tasks/{id}` | DELETE | Удаление задачи | Авторизованные пользователи |
+
+### Консольные команды (routes/console.php)
+
+| Команда | Описание |
+|---------|----------|
+| `php artisan inspire` | Выводит вдохновляющие цитаты в консоль |
+
+## Контроллеры и их функциональность
+
+### AuthController
+Управляет аутентификацией через API:
+- **login()** - проверяет учетные данные и выдает Sanctum токен
+- **register()** - создает нового пользователя и выдает токен
+- **logout()** - удаляет все токены пользователя
+
+### WebAuthController
+Обрабатывает веб-аутентификацию:
+- **showLoginForm()** - отображает форму входа
+- **login()** - авторизует пользователя через веб-сессию
+- **logout()** - завершает веб-сессию
+
+### TaskController
+Предоставляет REST API для задач:
+- **index()** - возвращает список задач с фильтрацией и сортировкой
+- **store()** - создает новую задачу
+- **show()** - возвращает конкретную задачу
+- **update()** - обновляет существующую задачу
+- **destroy()** - удаляет задачу
+
+### TaskWebController
+Обеспечивает веб-интерфейс для задач:
+- **index()** - отображает список задач с пагинацией и фильтрацией
+- **applySearch()** - выполняет оптимизированный поиск по задачам
+- **getStatusCounts()** - возвращает статистику с кэшированием
+
+## Примечания / Советы
+
+### Безопасность
+- Все пароли хешируются через bcrypt
+- Применяется rate limiting (5 попыток в минуту для входа/регистрации)
+- CSRF защита для веб-форм
+- Sanctum токены для API авторизации
+
+### Производительность
+- Составные индексы для быстрого поиска по задачам
+- Кэширование статистики задач (5 минут)
+- Автоматическое Gzip сжатие ответов
+- Оптимизированные SQL запросы
+
+### Разработка
+- Полная PHPDoc документация для всех методов
+- Валидация данных через Form Request классы
+- Middleware для сжатия контента
+- Docker окружение для разработки
+
+### Тестовые данные
+После выполнения сидеров будут созданы:
+- Тестовый пользователь: `test@example.com` / `password`
+- Примеры задач с разными статусами и приоритетами
+
+### Мониторинг
+- Логирование всех операций в `storage/logs/laravel.log`
+- Используйте `php artisan pail` для просмотра логов в реальном времени
+
+---
+
+**Технологии:** Laravel 12, PostgreSQL, Laravel Sanctum, Docker, Nginx

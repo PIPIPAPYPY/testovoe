@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
+/**
+ * Провайдер маршрутов приложения
+ * 
+ * Настраивает маршруты и ограничения скорости для API и веб-запросов
+ */
 class RouteServiceProvider extends ServiceProvider
 {
     /**
@@ -18,7 +23,8 @@ class RouteServiceProvider extends ServiceProvider
     public const HOME = '/home';
 
     /**
-     * Настройка маршрутов приложения
+     * Настроить маршруты и ограничения скорости приложения
+     * @return void
      */
     public function boot(): void
     {
