@@ -108,3 +108,4 @@ DB_PASSWORD=strong_password
 - [ ] CSRF защита работает
 - [ ] Валидация данных настроена
 
+
