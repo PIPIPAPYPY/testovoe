@@ -12,19 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            // Составной индекс для быстрого поиска по пользователю и статусу
             $table->index(['user_id', 'status'], 'tasks_user_status_index');
-            
-            // Составной индекс для поиска по пользователю и дате создания
             $table->index(['user_id', 'created_at'], 'tasks_user_created_index');
-            
-            // Индекс для поиска по приоритету
             $table->index('priority', 'tasks_priority_index');
-            
-            // Индекс для поиска по дедлайну
             $table->index('deadline', 'tasks_deadline_index');
-            
-            // Полнотекстовый индекс для поиска по title и description
             $table->index(['title', 'description'], 'tasks_search_index');
         });
     }
@@ -43,5 +34,7 @@ return new class extends Migration
         });
     }
 };
+
+
 
 

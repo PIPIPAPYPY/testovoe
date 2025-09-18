@@ -9,7 +9,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Создаем дефолтного пользователя если его нет
         $defaultUserId = DB::table('users')->first()?->id;
         
         if (!$defaultUserId) {
@@ -22,14 +21,12 @@ return new class extends Migration
             ]);
         }
 
-        // Обновляем существующие задачи
         DB::table('tasks')->whereNull('user_id')->update([
             'user_id' => $defaultUserId,
-            'priority' => 3, // Низкий приоритет по умолчанию
+            'priority' => 3,
             'updated_at' => now(),
         ]);
 
-        // Устанавливаем дефолтные значения для NULL полей
         DB::table('tasks')->whereNull('priority')->update([
             'priority' => 3,
             'updated_at' => now(),
@@ -38,8 +35,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // В down() можно вернуть NULL значения, но это может сломать приложение
-        // Поэтому просто оставляем пустым
     }
 };
 

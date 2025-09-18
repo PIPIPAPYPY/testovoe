@@ -333,7 +333,6 @@
 <script>
     let authToken = localStorage.getItem('token') || '';
 
-    // Проверяем авторизацию при загрузке
     window.onload = function() {
         if (authToken) {
             checkAuth();

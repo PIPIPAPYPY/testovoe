@@ -406,7 +406,6 @@
     </div>
 
     <script>
-        // Проверяем авторизацию при загрузке страницы
         window.onload = function() {
             checkAuth();
         };

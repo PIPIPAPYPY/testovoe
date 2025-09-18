@@ -4,6 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="@yield('description', 'Система управления задачами')">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>@yield('title', 'Приложение')</title>
 	
 	<!-- Preload критических ресурсов -->
@@ -63,11 +64,9 @@
 	
 	<!-- Оптимизированный JavaScript -->
 	<script>
-		// Критический JavaScript - минифицированный
 		(function(){
 			'use strict';
 			
-			// Ленивая загрузка изображений
 			if('IntersectionObserver' in window){
 				const imgObserver=new IntersectionObserver((entries,observer)=>{
 					entries.forEach(entry=>{
@@ -85,7 +84,6 @@
 				});
 			}
 			
-			// Оптимизация форм
 			document.querySelectorAll('form').forEach(form=>{
 				form.addEventListener('submit',function(e){
 					const submitBtn=this.querySelector('button[type="submit"]');
@@ -96,7 +94,6 @@
 				});
 			});
 			
-			// Debounce для поиска
 			function debounce(func,wait){
 				let timeout;
 				return function executedFunction(...args){
@@ -109,11 +106,9 @@
 				};
 			}
 			
-			// Применяем debounce к полям поиска
 			document.querySelectorAll('input[type="text"]').forEach(input=>{
 				if(input.name==='search'){
 					input.addEventListener('input',debounce(()=>{
-						// Здесь можно добавить AJAX поиск
 					},300));
 				}
 			});
