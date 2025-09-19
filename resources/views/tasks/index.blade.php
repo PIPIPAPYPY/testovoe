@@ -3,6 +3,10 @@
 @section('title', 'Список задач - Task Management')
 @section('description', 'Управляйте своими задачами эффективно')
 
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/app.css') }}">
+@endpush
+
 @section('content')
 <style>
         /* Переопределяем стили body для соответствия главной странице */
@@ -386,42 +390,238 @@
             opacity: 0.8;
         }
 
-        /* Пагинация */
-        .pagination-wrapper {
+        /* Кнопка добавления задачи */
+        .add-task-section {
             display: flex;
             justify-content: center;
-            margin-top: 40px;
+            margin-bottom: 30px;
         }
 
-        .pagination-wrapper .pagination {
-            background: white;
-            border-radius: 50px;
-            padding: 15px 25px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        .btn-add-task {
+            font-size: 1.1rem;
+            padding: 15px 30px;
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+        }
+
+        .btn-add-task:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102,126,234,0.5);
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .pagination-wrapper .pagination a,
-        .pagination-wrapper .pagination span {
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #667eea;
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
             font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s ease;
         }
 
-        .pagination-wrapper .pagination a:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-1px);
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
         }
 
-        .pagination-wrapper .pagination .active span {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        /* Форма задачи */
+        .task-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 0.2rem rgba(102,126,234,.15);
+        }
+
+        .form-input::placeholder {
+            color: #adb5bd;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        /* Компактная красивая пагинация */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .pagination-nav {
+            background: white;
+            border-radius: 10px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .pagination-list {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .page-item {
+            margin: 0;
+        }
+
+        .page-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 10px;
+            min-width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            background: transparent;
+        }
+
+        .page-link:hover {
+            background: #667eea;
             color: white;
+            text-decoration: none;
+        }
+
+        .page-item.active .page-link {
+            background: #667eea;
+            color: white;
+        }
+
+        .page-item.disabled .page-link {
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .page-item.disabled .page-link:hover {
+            background: transparent;
+            color: #adb5bd;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* Оптимизация производительности */
@@ -446,6 +646,44 @@
             .stat-badge { padding: 8px 16px; font-size: 0.9rem; }
             .filter-section { padding: 20px; }
             .task-card { padding: 20px; }
+            
+            .modal-content { 
+                width: 95%; 
+                margin: 20px;
+            }
+            
+            .modal-header { 
+                padding: 20px; 
+            }
+            
+            .task-form { 
+                padding: 20px; 
+            }
+            
+            .form-row { 
+                grid-template-columns: 1fr; 
+                gap: 15px; 
+            }
+            
+            .form-actions { 
+                flex-direction: column; 
+            }
+            
+            .btn-add-task {
+                font-size: 1rem;
+                padding: 12px 24px;
+            }
+            
+            .pagination-nav {
+                padding: 3px;
+            }
+            
+            .page-link {
+                padding: 4px 8px;
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
         }
     </style>
     
@@ -469,6 +707,14 @@
                 Выполнено: <span class="stat-number">{{ $statusCounts['done'] }}</span>
             </div>
         </div>
+    </div>
+
+    <!-- Кнопка добавления задачи -->
+    <div class="add-task-section">
+        <button id="addTaskBtn" class="btn btn-primary btn-add-task">
+            <span class="btn-icon">➕</span>
+            Добавить новую задачу
+        </button>
     </div>
 
     <!-- Фильтр в стиле карточек -->
@@ -549,9 +795,7 @@
         <!-- Пагинация -->
         @if($tasks->hasPages())
             <div class="pagination-wrapper">
-                <div class="pagination">
-                    {{ $tasks->links() }}
-                </div>
+                {{ $tasks->links('custom-pagination') }}
             </div>
         @endif
     @else
@@ -560,9 +804,59 @@
             <p>Создайте свою первую задачу через API или добавьте существующие</p>
         </div>
     @endif
+
+    <!-- Модальное окно для добавления задачи -->
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✨ Создать новую задачу</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <form id="addTaskForm" class="task-form">
+                <div class="form-group">
+                    <label for="taskTitle">Название задачи *</label>
+                    <input type="text" id="taskTitle" name="title" class="form-input" placeholder="Введите название задачи..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">Описание</label>
+                    <textarea id="taskDescription" name="description" class="form-input" rows="4" placeholder="Опишите детали задачи..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="taskPriority">Приоритет</label>
+                        <select id="taskPriority" name="priority" class="form-input">
+                            <option value="3">Низкий</option>
+                            <option value="2" selected>Средний</option>
+                            <option value="1">Высокий</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="taskStatus">Статус</label>
+                        <select id="taskStatus" name="status" class="form-input">
+                            <option value="todo" selected>К выполнению</option>
+                            <option value="in_progress">В работе</option>
+                            <option value="done">Выполнено</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Отмена</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="btn-icon">💾</span>
+                        Создать задачу
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 
 @section('scripts')
+<script src="{{ asset('js/app.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         'use strict';
@@ -641,14 +935,15 @@
         taskCard.classList.add('updating');
 
         try {
-            const response = await fetch(`/api/tasks/${taskId}`, {
+            const response = await fetch(`/tasks/${taskId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify({
                     status: newStatus
                 })
@@ -684,5 +979,105 @@
             }, 300);
         }, 2500);
     }
+
+    // Модальное окно для добавления задач
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('addTaskModal');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const addTaskForm = document.getElementById('addTaskForm');
+
+        // Открытие модального окна
+        addTaskBtn.addEventListener('click', function() {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('taskTitle').focus();
+        });
+
+        // Закрытие модального окна
+        function closeModalWindow() {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            addTaskForm.reset();
+        }
+
+        closeModal.addEventListener('click', closeModalWindow);
+        cancelBtn.addEventListener('click', closeModalWindow);
+
+        // Закрытие по клику вне модального окна
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModalWindow();
+            }
+        });
+
+        // Закрытие по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('show')) {
+                closeModalWindow();
+            }
+        });
+
+        // Отправка формы
+        addTaskForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            // Показываем загрузку
+            submitBtn.innerHTML = '<span class="btn-icon">⏳</span>Создание...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(this);
+                const taskData = {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    priority: parseInt(formData.get('priority')),
+                    status: formData.get('status')
+                };
+
+                const response = await fetch('/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(taskData)
+                });
+
+                if (response.ok) {
+                    showNotification('Задача успешно создана!', 'success');
+                    closeModalWindow();
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    const errorText = await response.text();
+                    console.error('Server response:', response.status, errorText);
+                    let errorMessage = 'Ошибка при создании задачи';
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = errorData.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                    }
+                    throw new Error(errorMessage);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                showNotification(error.message || 'Не удалось создать задачу', 'error');
+            } finally {
+                // Восстанавливаем кнопку
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    });
 </script>
 @endsection

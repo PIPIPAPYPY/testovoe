@@ -2,138 +2,107 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
+use App\Models\Task;
+use App\Services\TaskService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use App\Models\Task;
+use Illuminate\View\View;
 
 /**
  * Контроллер для веб-интерфейса задач
  * 
- * Обеспечивает отображение задач в браузере с пагинацией и фильтрацией
+ * Следует принципам SOLID:
+ * - Single Responsibility: только веб-интерфейс
+ * - Dependency Inversion: зависит от абстракций (TaskService)
  */
 class TaskWebController extends Controller
 {
-    /**
-     * Отобразить список задач пользователя с пагинацией
-     * @param Request $request HTTP запрос с параметрами фильтрации
-     * @return \Illuminate\View\View
-     */
-    public function index(Request $request)
-    {
-        $query = $this->getUserTasksQuery();
-        
-        $this->applyFilters($query, $request);
-        $this->applySearch($query, $request);
-        
-        $tasks = $query->orderBy('created_at', 'desc')
-                      ->paginate(10)
-                      ->appends($request->all());
+    public function __construct(
+        private TaskService $taskService
+    ) {
+        $this->authorizeResource(Task::class, 'task');
+    }
 
-        $statusCounts = $this->getStatusCounts();
+    /**
+     * Отобразить список задач пользователя
+     */
+    public function index(Request $request): View
+    {
+        $filters = $request->only(['status', 'search', 'priority']);
+        $tasks = $this->taskService->getUserTasks(Auth::id(), $filters);
+        $statusCounts = $this->taskService->getStatusCounts(Auth::id());
 
         return view('tasks.index', compact('tasks', 'statusCounts'));
     }
 
     /**
-     * Очистить кэш статистики задач пользователя
-     * @param int $userId Идентификатор пользователя
-     * @return void
+     * Создать новую задачу
      */
-    private function clearUserStatsCache(int $userId): void
+    public function store(StoreTaskRequest $request): JsonResponse
     {
-        Cache::forget("user_{$userId}_task_counts");
-    }
+        try {
+            $task = $this->taskService->createTask(
+                Auth::id(), 
+                $request->validated()
+            );
 
-    /**
-     * Получить запрос для задач текущего пользователя
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function getUserTasksQuery()
-    {
-        return Task::forUser(Auth::id());
-    }
-
-    /**
-     * Применить фильтры к запросу задач
-     * @param \Illuminate\Database\Eloquent\Builder $query Построитель запроса
-     * @param Request $request HTTP запрос с параметрами фильтрации
-     * @return void
-     */
-    private function applyFilters($query, Request $request): void
-    {
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            return response()->json([
+                'success' => true,
+                'message' => 'Задача успешно создана',
+                'task' => $task
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при создании задачи: ' . $e->getMessage()
+            ], 500);
         }
     }
 
     /**
-     * Применить поиск к запросу задач по названию и описанию
-     * @param \Illuminate\Database\Eloquent\Builder $query Построитель запроса
-     * @param Request $request HTTP запрос с параметром поиска
-     * @return void
+     * Обновить задачу
      */
-    private function applySearch($query, Request $request): void
+    public function update(UpdateTaskRequest $request, Task $task): JsonResponse
     {
-        if (!$request->filled('search')) {
-            return;
-        }
+        try {
+            $updatedTask = $this->taskService->updateTask(
+                $task, 
+                $request->validated()
+            );
 
-        $searchTerm = trim($request->search);
-        if (empty($searchTerm)) {
-            return;
+            return response()->json([
+                'success' => true,
+                'message' => 'Задача успешно обновлена',
+                'task' => $updatedTask
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при обновлении задачи: ' . $e->getMessage()
+            ], 500);
         }
-
-        $searchTerm = preg_replace('/[\x00-\x1F\x7F]/u', '', $searchTerm);
-        
-        if (empty($searchTerm)) {
-            return;
-        }
-
-        $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $searchTerm);
-        
-        $words = preg_split('/\s+/u', $escaped, -1, PREG_SPLIT_NO_EMPTY);
-        
-        if (empty($words)) {
-            return;
-        }
-
-        $query->where(function ($q) use ($words) {
-            foreach ($words as $word) {
-                $like = '%' . mb_strtolower($word) . '%';
-                $q->where(function ($q2) use ($like) {
-                    $q2->whereRaw('LOWER(title) LIKE ?', [$like])
-                        ->orWhereRaw('LOWER(description) LIKE ?', [$like]);
-                });
-            }
-        });
     }
 
     /**
-     * Получить статистику по статусам задач с кэшированием
-     * @return array Массив с количеством задач по статусам
+     * Удалить задачу
      */
-    private function getStatusCounts(): array
+    public function destroy(Task $task): JsonResponse
     {
-        $userId = Auth::id();
-        $cacheKey = "user_{$userId}_task_counts";
-        
-        return Cache::remember($cacheKey, 300, function () use ($userId) {
-            $counts = Task::forUser($userId)
-                ->selectRaw('
-                    COUNT(*) as all_count,
-                    SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as todo_count,
-                    SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as in_progress_count,
-                    SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as done_count
-                ', ['todo', 'in_progress', 'done'])
-                ->first();
-            
-            return [
-                'all' => $counts->all_count,
-                'todo' => $counts->todo_count,
-                'in_progress' => $counts->in_progress_count,
-                'done' => $counts->done_count,
-            ];
-        });
+        try {
+            $this->taskService->deleteTask($task);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Задача успешно удалена'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при удалении задачи: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

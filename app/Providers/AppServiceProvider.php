@@ -17,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Регистрируем TaskService как singleton
+        $this->app->singleton(\App\Services\TaskService::class);
     }
 
     /**
@@ -25,5 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Регистрируем Observer для модели Task
+        \App\Models\Task::observe(\App\Observers\TaskObserver::class);
     }
 }

@@ -49,6 +49,7 @@
 				<span class="avatar">{{ mb_substr(auth()->user()->name ?? 'U', 0, 1) }}</span>
 				<span>{{ auth()->user()->name }}</span>
 				<a class="link" href="{{ route('tasks.index') }}">Мои задачи</a>
+				<a class="link" href="{{ route('analytics.index') }}">Аналитика</a>
 				<form method="POST" action="{{ route('logout') }}" style="display:inline">
 					@csrf
 					<button type="submit" class="link" style="background:none;border:none;cursor:pointer">Выйти</button>

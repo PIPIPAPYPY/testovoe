@@ -328,6 +328,79 @@
             <div class="response-area" id="deleteTaskResponse"></div>
         </div>
     </div>
+
+    <!-- Секция аналитики -->
+    <div class="api-section">
+        <h2>📊 Аналитика</h2>
+        
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/overall-stats - Общая статистика</div>
+            <button class="btn btn-primary" onclick="getOverallStats()">Получить общую статистику</button>
+            <div class="response-area" id="overallStatsResponse"></div>
+        </div>
+
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/completed-tasks-chart - График выполненных задач</div>
+            <div class="form-group">
+                <label for="chartPeriod">Период:</label>
+                <select id="chartPeriod" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                    <option value="day">День</option>
+                    <option value="week">Неделя</option>
+                    <option value="month" selected>Месяц</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="chartType">Тип графика:</label>
+                <select id="chartType" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px;">
+                    <option value="line" selected>Линейный</option>
+                    <option value="bar">Столбчатый</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" onclick="getCompletedTasksChart()">Получить график</button>
+            <div class="response-area" id="completedTasksChartResponse"></div>
+        </div>
+
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/category-chart - График по категориям</div>
+            <button class="btn btn-primary" onclick="getCategoryChart()">Получить график категорий</button>
+            <div class="response-area" id="categoryChartResponse"></div>
+        </div>
+
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/tag-chart - График по тегам</div>
+            <button class="btn btn-primary" onclick="getTagChart()">Получить график тегов</button>
+            <div class="response-area" id="tagChartResponse"></div>
+        </div>
+
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/productive-days-chart - График продуктивных дней</div>
+            <button class="btn btn-primary" onclick="getProductiveDaysChart()">Получить график продуктивности</button>
+            <div class="response-area" id="productiveDaysChartResponse"></div>
+        </div>
+
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/categories - Доступные категории</div>
+            <button class="btn btn-primary" onclick="getCategories()">Получить категории</button>
+            <div class="response-area" id="categoriesResponse"></div>
+        </div>
+
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/analytics/tags - Доступные теги</div>
+            <button class="btn btn-primary" onclick="getTags()">Получить теги</button>
+            <div class="response-area" id="tagsResponse"></div>
+        </div>
+    </div>
+
+    <!-- Секция пользователя -->
+    <div class="api-section">
+        <h2>👤 Пользователь</h2>
+        
+        <div class="endpoint-group">
+            <div class="endpoint-title">GET /api/user - Получить данные текущего пользователя</div>
+            <button class="btn btn-primary" onclick="getCurrentUser()">Получить данные пользователя</button>
+            <div class="response-area" id="currentUserResponse"></div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -591,6 +664,138 @@
             displayResponse('deleteTaskResponse', response.status, data);
         } catch (error) {
             displayResponse('deleteTaskResponse', 0, { error: error.message });
+        }
+    }
+
+    // Аналитика
+    async function getOverallStats() {
+        try {
+            const response = await fetch('/api/analytics/overall-stats', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('overallStatsResponse', response.status, data);
+        } catch (error) {
+            displayResponse('overallStatsResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getCompletedTasksChart() {
+        const period = document.getElementById('chartPeriod').value;
+        const chartType = document.getElementById('chartType').value;
+
+        try {
+            const response = await fetch(`/api/analytics/completed-tasks-chart?period=${period}&chart_type=${chartType}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('completedTasksChartResponse', response.status, data);
+        } catch (error) {
+            displayResponse('completedTasksChartResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getCategoryChart() {
+        try {
+            const response = await fetch('/api/analytics/category-chart', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('categoryChartResponse', response.status, data);
+        } catch (error) {
+            displayResponse('categoryChartResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getTagChart() {
+        try {
+            const response = await fetch('/api/analytics/tag-chart', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('tagChartResponse', response.status, data);
+        } catch (error) {
+            displayResponse('tagChartResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getProductiveDaysChart() {
+        try {
+            const response = await fetch('/api/analytics/productive-days-chart', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('productiveDaysChartResponse', response.status, data);
+        } catch (error) {
+            displayResponse('productiveDaysChartResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getCategories() {
+        try {
+            const response = await fetch('/api/analytics/categories', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('categoriesResponse', response.status, data);
+        } catch (error) {
+            displayResponse('categoriesResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getTags() {
+        try {
+            const response = await fetch('/api/analytics/tags', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('tagsResponse', response.status, data);
+        } catch (error) {
+            displayResponse('tagsResponse', 0, { error: error.message });
+        }
+    }
+
+    async function getCurrentUser() {
+        try {
+            const response = await fetch('/api/user', {
+                headers: {
+                    'Accept': 'application/json',
+                    ...getAuthHeaders(),
+                }
+            });
+
+            const data = await response.json();
+            displayResponse('currentUserResponse', response.status, data);
+        } catch (error) {
+            displayResponse('currentUserResponse', 0, { error: error.message });
         }
     }
 

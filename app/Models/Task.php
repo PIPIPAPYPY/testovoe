@@ -2,18 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Модель задачи пользователя
  * 
- * Содержит информацию о задачах: название, описание, статус, приоритет, дедлайн
+ * @property int $id
+ * @property string $title
+ * @property string|null $description
+ * @property string $status
+ * @property int $priority
+ * @property int $user_id
+ * @property \Carbon\Carbon|null $deadline
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
  */
 class Task extends Model
 {
-    protected $fillable = ['title', 'description', 'status', 'user_id', 'priority', 'deadline'];
+    use HasFactory;
+
+    protected $fillable = [
+        'title', 
+        'description', 
+        'status', 
+        'user_id', 
+        'priority', 
+        'deadline'
+    ];
 
     protected $casts = [
         'deadline' => 'datetime',
@@ -21,42 +39,115 @@ class Task extends Model
         'user_id' => 'integer',
     ];
 
+    protected $attributes = [
+        'status' => 'todo',
+        'priority' => 2,
+    ];
+
+    /**
+     * Статусы задач
+     */
+    public const STATUS_TODO = 'todo';
+    public const STATUS_IN_PROGRESS = 'in_progress';
+    public const STATUS_DONE = 'done';
+
+    /**
+     * Приоритеты задач
+     */
+    public const PRIORITY_HIGH = 1;
+    public const PRIORITY_MEDIUM = 2;
+    public const PRIORITY_LOW = 3;
+
     /**
      * Получить задачи конкретного пользователя
-     * @param \Illuminate\Database\Eloquent\Builder $query Построитель запроса
-     * @param int $userId Идентификатор пользователя
-     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeForUser($query, $userId)
+    public function scopeForUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
-     * Очистить кэш статистики при изменении модели
-     * @return void
+     * Фильтр по статусу
      */
-    protected static function booted()
+    public function scopeByStatus(Builder $query, string $status): Builder
     {
-        static::created(function ($task) {
-            Cache::forget("user_{$task->user_id}_task_counts");
-        });
+        return $query->where('status', $status);
+    }
 
-        static::updated(function ($task) {
-            Cache::forget("user_{$task->user_id}_task_counts");
-        });
+    /**
+     * Фильтр по приоритету
+     */
+    public function scopeByPriority(Builder $query, int $priority): Builder
+    {
+        return $query->where('priority', $priority);
+    }
 
-        static::deleted(function ($task) {
-            Cache::forget("user_{$task->user_id}_task_counts");
-        });
+    /**
+     * Фильтр по просроченным задачам
+     */
+    public function scopeOverdue(Builder $query): Builder
+    {
+        return $query->where('deadline', '<', now())
+                    ->where('status', '!=', self::STATUS_DONE);
+    }
+
+    /**
+     * Фильтр по выполненным задачам
+     */
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_DONE);
     }
 
     /**
      * Получить пользователя, которому принадлежит задача
-     * @return BelongsTo
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Проверить, просрочена ли задача
+     */
+    public function isOverdue(): bool
+    {
+        return $this->deadline && 
+               $this->deadline->isPast() && 
+               $this->status !== self::STATUS_DONE;
+    }
+
+    /**
+     * Проверить, выполнена ли задача
+     */
+    public function isCompleted(): bool
+    {
+        return $this->status === self::STATUS_DONE;
+    }
+
+    /**
+     * Получить человекочитаемый статус
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            self::STATUS_TODO => 'К выполнению',
+            self::STATUS_IN_PROGRESS => 'В работе',
+            self::STATUS_DONE => 'Выполнено',
+            default => 'Неизвестно',
+        };
+    }
+
+    /**
+     * Получить человекочитаемый приоритет
+     */
+    public function getPriorityLabelAttribute(): string
+    {
+        return match ($this->priority) {
+            self::PRIORITY_HIGH => 'Высокий',
+            self::PRIORITY_MEDIUM => 'Средний',
+            self::PRIORITY_LOW => 'Низкий',
+            default => 'Неизвестно',
+        };
     }
 }

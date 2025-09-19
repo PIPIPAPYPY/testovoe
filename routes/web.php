@@ -24,12 +24,37 @@ Route::get('/register', function () {
 });
 
 /**
- * Список задач пользователя
- * Отображает веб-интерфейс с задачами текущего пользователя, фильтрацией и пагинацией
+ * Веб-маршруты для управления задачами
+ * Используют веб-сессии вместо API токенов
+ * Доступно: только авторизованным пользователям
+ */
+Route::middleware(['auth', 'compress'])->group(function () {
+    Route::get('/tasks', [TaskWebController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [TaskWebController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [TaskWebController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskWebController::class, 'destroy'])->name('tasks.destroy');
+});
+
+/**
+ * Аналитика задач пользователя
+ * Отображает страницу с графиками и статистикой по задачам пользователя
  * Доступно: только авторизованным пользователям
  * Middleware: auth - проверка авторизации, compress - сжатие ответа
  */
-Route::get('/tasks', [TaskWebController::class, 'index'])->middleware(['auth', 'compress'])->name('tasks.index');
+Route::get('/analytics', [App\Http\Controllers\AnalyticsController::class, 'index'])->middleware(['auth', 'compress'])->name('analytics.index');
+
+/**
+ * Веб-endpoints для аналитики (используют веб-сессии вместо API токенов)
+ * Доступно: только авторизованным пользователям через веб-сессию
+ */
+Route::middleware(['auth', 'compress'])->prefix('analytics')->group(function () {
+    Route::get('task-creation-chart', [App\Http\Controllers\AnalyticsController::class, 'getTaskCreationChart'])->name('analytics.task-creation-chart');
+    Route::get('completion-chart', [App\Http\Controllers\AnalyticsController::class, 'getCompletionChart'])->name('analytics.completion-chart');
+    Route::get('priority-chart', [App\Http\Controllers\AnalyticsController::class, 'getPriorityChart'])->name('analytics.priority-chart');
+    Route::get('weekly-activity-chart', [App\Http\Controllers\AnalyticsController::class, 'getWeeklyActivityChart'])->name('analytics.weekly-activity-chart');
+
+    Route::get('overall-stats', [App\Http\Controllers\AnalyticsController::class, 'getOverallStats'])->name('analytics.overall-stats');
+});
 
 /**
  * Страница тестирования API

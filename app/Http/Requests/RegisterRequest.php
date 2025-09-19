@@ -30,7 +30,7 @@ class RegisterRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'confirmed', Password::min(8)->mixedCase()->numbers()->symbols()],
+            'password' => ['required', 'string', 'min:8'],
         ];
     }
 
@@ -47,11 +47,7 @@ class RegisterRequest extends FormRequest
             'email.email' => 'Введите корректный email адрес.',
             'email.unique' => 'Пользователь с таким email уже существует.',
             'password.required' => 'Пароль обязателен для заполнения.',
-            'password.confirmed' => 'Пароли не совпадают.',
             'password.min' => 'Пароль должен содержать минимум 8 символов.',
-            'password.mixed_case' => 'Пароль должен содержать заглавные и строчные буквы.',
-            'password.numbers' => 'Пароль должен содержать цифры.',
-            'password.symbols' => 'Пароль должен содержать специальные символы.',
         ];
     }
 }
