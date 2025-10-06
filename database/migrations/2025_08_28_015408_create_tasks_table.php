@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->enum('status', ['todo', 'in_progress', 'done'])->default('todo');
             $table->dateTime('deadline')->nullable();
-            $table->unsignedTinyInteger('priority')->default(3); // 1-high,2-med,3-low
+            $table->integer('priority')->default(2); // 1-high,2-med,3-low
             $table->timestamps();
             $table->index('status');
             $table->index('created_at');

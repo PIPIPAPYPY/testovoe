@@ -66,7 +66,7 @@ class AuthController extends Controller
                 'message' => 'Регистрация успешна',
                 'user' => $user,
                 'token' => $token
-            ]);
+            ], 201);
         }
 
         return redirect()->intended(route('tasks.index'));
