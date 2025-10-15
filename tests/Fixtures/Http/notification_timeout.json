@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.notifications.example.com/notifications",
+    "headers": {
+      "Authorization": "Bearer test-api-key",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user_id": 1,
+      "message": "Test notification"
+    }
+  },
+  "response": {
+    "status": 0,
+    "headers": {},
+    "body": null,
+    "error": {
+      "type": "ConnectionException",
+      "message": "Connection timeout after 10 seconds",
+      "code": "TIMEOUT"
+    }
+  }
+}
+
+
+

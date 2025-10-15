@@ -1,34 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         colors="true"
->
-    <testsuites>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory>tests/Feature</directory>
-        </testsuite>
-    </testsuites>
-    <source>
-        <include>
-            <directory>app</directory>
-        </include>
-    </source>
-    <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value="database/testing.sqlite"/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="PULSE_ENABLED" value="false"/>
-        <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="NIGHTWATCH_ENABLED" value="false"/>
-    </php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd" bootstrap="vendor/autoload.php" colors="true" processIsolation="false" stopOnFailure="false" cacheResult="false" executionOrder="depends,defects" requireCoverageMetadata="false" beStrictAboutCoverageMetadata="false" beStrictAboutOutputDuringTests="true" failOnRisky="false" failOnWarning="true">
+  <testsuites>
+    <testsuite name="Unit">
+      <directory>tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Feature">
+      <directory>tests/Feature</directory>
+    </testsuite>
+    <testsuite name="PostgreSQL">
+      <file>tests/Feature/PostgreSQLCompatibilityTest.php</file>
+    </testsuite>
+    <testsuite name="Performance">
+      <file>tests/Feature/Performance/PerformanceTest.php</file>
+    </testsuite>
+    <testsuite name="Security">
+      <directory>tests/Feature/Security</directory>
+    </testsuite>
+    <testsuite name="External">
+      <directory>tests/Feature/External</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory>app</directory>
+    </include>
+    <exclude>
+      <directory>app/Console</directory>
+      <directory>app/Exceptions</directory>
+      <directory>app/Http/Middleware</directory>
+    </exclude>
+  </source>
+  <php>
+    <!-- Общие настройки -->
+    <env name="APP_ENV" value="testing"/>
+    <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+    <env name="BCRYPT_ROUNDS" value="4"/>
+    <env name="CACHE_STORE" value="array"/>
+    <env name="MAIL_MAILER" value="array"/>
+    <env name="QUEUE_CONNECTION" value="sync"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="PULSE_ENABLED" value="false"/>
+    <env name="TELESCOPE_ENABLED" value="false"/>
+    <env name="NIGHTWATCH_ENABLED" value="false"/>
+    <!-- Настройки базы данных по умолчанию (SQLite) -->
+    <env name="DB_CONNECTION" value="sqlite"/>
+    <env name="DB_DATABASE" value="database/testing.sqlite"/>
+    <!-- Настройки для PostgreSQL (переопределяются в CI) -->
+    <env name="DB_PGSQL_HOST" value="127.0.0.1"/>
+    <env name="DB_PGSQL_PORT" value="5432"/>
+    <env name="DB_PGSQL_DATABASE" value="testing"/>
+    <env name="DB_PGSQL_USERNAME" value="postgres"/>
+    <env name="DB_PGSQL_PASSWORD" value="postgres"/>
+  </php>
 </phpunit>

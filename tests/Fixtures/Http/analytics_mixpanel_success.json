@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.mixpanel.com/track",
+    "headers": {
+      "Authorization": "Basic test-mixpanel-key",
+      "Content-Type": "application/json",
+      "X-Provider": "mixpanel"
+    },
+    "body": {
+      "event": "task_created",
+      "properties": {
+        "distinct_id": "user_123",
+        "task_id": 123,
+        "timestamp": "2024-01-01T12:00:00Z"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "status": 1,
+      "error": null
+    }
+  }
+}
+
+
+

@@ -1,0 +1,19 @@
+2025-10-02 14:51:49.542 MSK [17948] LOG:  starting PostgreSQL 18.0 on x86_64-windows, compiled by msvc-19.44.35215, 64-bit
+2025-10-02 14:51:49.546 MSK [17948] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-10-02 14:51:49.546 MSK [17948] LOG:  listening on IPv6 address "::1", port 5432
+2025-10-02 14:51:49.592 MSK [9528] LOG:  database system was shut down at 2025-10-02 14:51:38 MSK
+2025-10-02 14:51:49.599 MSK [17948] LOG:  database system is ready to accept connections
+2025-10-02 14:51:53.250 MSK [7892] FATAL:  role "postgres" does not exist
+2025-10-02 14:51:53.277 MSK [16612] FATAL:  role "postgres" does not exist
+2025-10-02 14:52:01.189 MSK [2864] FATAL:  role "postgres" does not exist
+2025-10-02 14:52:01.211 MSK [19040] FATAL:  role "postgres" does not exist
+2025-10-02 14:56:49.588 MSK [15460] LOG:  checkpoint starting: time
+2025-10-02 14:58:42.933 MSK [15460] LOG:  checkpoint complete: wrote 1033 buffers (6.3%), wrote 3 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=112.138 s, sync=0.463 s, total=113.345 s; sync files=319, longest=0.039 s, average=0.002 s; distance=4981 kB, estimate=4981 kB; lsn=0/1CC39E8, redo lsn=0/1CC3958
+2025-10-02 15:51:31.902 MSK [17948] LOG:  background worker "logical replication launcher" (PID 19220) was terminated by exception 0xC000013A
+2025-10-02 15:51:31.902 MSK [17948] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-10-02 15:51:31.903 MSK [17948] LOG:  terminating any other active server processes
+2025-10-02 15:51:31.910 MSK [17948] LOG:  all server processes terminated; reinitializing
+2025-10-02 15:51:31.978 MSK [17948] LOG:  startup process (PID 17032) was terminated by exception 0xC0000142
+2025-10-02 15:51:31.978 MSK [17948] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-10-02 15:51:31.978 MSK [17948] LOG:  aborting startup due to startup process failure
+2025-10-02 15:51:31.978 MSK [17948] LOG:  database system is shut down

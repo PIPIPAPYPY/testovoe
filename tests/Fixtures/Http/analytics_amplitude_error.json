@@ -1,0 +1,39 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api2.amplitude.com/2/httpapi",
+    "headers": {
+      "Authorization": "Bearer test-amplitude-key",
+      "Content-Type": "application/json",
+      "X-Provider": "amplitude"
+    },
+    "body": {
+      "api_key": "test-amplitude-key",
+      "events": [
+        {
+          "event_type": "task_created",
+          "user_id": "user_123",
+          "event_properties": {
+            "task_id": 123
+          },
+          "timestamp": "2024-01-01T12:00:00Z"
+        }
+      ]
+    }
+  },
+  "response": {
+    "status": 429,
+    "headers": {
+      "Content-Type": "application/json",
+      "Retry-After": "60"
+    },
+    "body": {
+      "error": "Rate limit exceeded",
+      "message": "Too many requests per minute",
+      "code": "RATE_LIMIT_EXCEEDED"
+    }
+  }
+}
+
+
+

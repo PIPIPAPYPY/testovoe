@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://www.google-analytics.com/collect",
+    "headers": {
+      "Authorization": "Bearer test-ga-key",
+      "Content-Type": "application/json",
+      "X-Provider": "google_analytics"
+    },
+    "body": {
+      "v": 1,
+      "tid": "GA-TRACKING-ID",
+      "cid": "user_123",
+      "t": "event",
+      "ec": "Task Management",
+      "ea": "task_created",
+      "el": "Task ID: 123"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "text/plain"
+    },
+    "body": "OK"
+  }
+}
+
+
+

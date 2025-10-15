@@ -1,0 +1,32 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.notifications.example.com/notifications",
+    "headers": {
+      "Authorization": "Bearer test-api-key",
+      "Content-Type": "application/json",
+      "User-Agent": "Laravel-TaskManager/1.0"
+    },
+    "body": {
+      "user_id": 1,
+      "message": "Test notification",
+      "type": "task_reminder"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json",
+      "X-Rate-Limit-Remaining": "99"
+    },
+    "body": {
+      "id": "notif_123456",
+      "status": "sent",
+      "delivered_at": "2024-01-01T12:00:00Z",
+      "provider": "email"
+    }
+  }
+}
+
+
+

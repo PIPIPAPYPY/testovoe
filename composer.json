@@ -55,6 +55,41 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
+        ],
+        "test:quick": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=Unit",
+            "@php artisan test --filter=\"BasicFeatureTest|SimpleTaskTest|WorkingTaskTest|SimpleApiTest|SimpleAuthTest|WorkingApiTest\""
+        ],
+        "test:postgresql": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=Unit",
+            "@php artisan test --testsuite=Feature",
+            "@php artisan test --testsuite=PostgreSQL"
+        ],
+        "test:performance": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=Performance"
+        ],
+        "test:coverage": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --coverage --coverage-html=coverage"
+        ],
+        "test:security": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=Security"
+        ],
+        "test:rbac": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --filter=\"RbacTest|DataAccessSecurityTest|ApiAuthorizationTest|TokenSecurityTest\""
+        ],
+        "test:external": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --testsuite=External"
+        ],
+        "test:mocking": [
+            "@php artisan config:clear --ansi",
+            "@php artisan test --filter=\"NotificationServiceTest|AnalyticsProviderServiceTest|ErrorScenarioTest|VcrFixtureTest\""
         ]
     },
     "extra": {

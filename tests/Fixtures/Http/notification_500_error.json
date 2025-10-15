@@ -1,0 +1,29 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "https://api.notifications.example.com/notifications",
+    "headers": {
+      "Authorization": "Bearer test-api-key",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "user_id": 1,
+      "message": "Test notification"
+    }
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "Content-Type": "application/json",
+      "Retry-After": "30"
+    },
+    "body": {
+      "error": "Internal Server Error",
+      "message": "Database connection failed",
+      "code": "DB_CONNECTION_ERROR"
+    }
+  }
+}
+
+
+
