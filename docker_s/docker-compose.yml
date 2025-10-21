@@ -1,0 +1,50 @@
+version: "3.1"
+services:
+  webserver:
+    image: nginx:alpine
+    container_name: ${PROJECT_NAME}-webserver
+    working_dir: /application
+    networks:
+      - internal
+    volumes:
+      - ./../:/application
+      - ./sourcefiles/nginx:/etc/nginx/conf.d
+    ports:
+      - "${NGINX_PORT}:80"
+
+  php-fpm:
+    build: sourcefiles/php-fpm
+    container_name: ${PROJECT_NAME}-php-fpm
+
+    working_dir: /application
+    environment:
+      - PHP_WORKER_INSTALL_BCMATH=true
+    volumes:
+      - ./../:/application
+      - ./sourcefiles/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+    networks:
+      - internal
+  pgsql:
+    image: postgres:13
+    container_name: ${PROJECT_NAME}-pgsql
+    env_file:
+      - .env
+    environment:
+      PGPASSWORD: '${DB_PASSWORD}'
+      POSTGRES_DB: '${DB_DATABASE}'
+      POSTGRES_USER: '${DB_USERNAME}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+    volumes:
+      - ./sourcefiles/pgsql:/tmp
+      - 'pg-data:/var/lib/postgresql/data'
+    ports:
+      - '${DB_PORT}:5432'
+    networks:
+      - internal
+
+volumes:
+  pg-data:
+    driver: local
+networks:
+  internal:
+    driver: bridge
