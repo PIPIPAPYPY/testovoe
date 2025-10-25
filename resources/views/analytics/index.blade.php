@@ -421,10 +421,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     'use strict';
 
-    // Хранилище для графиков
     const charts = {};
 
-    // Инициализация
     initializeCharts();
     setupEventListeners();
 
@@ -437,22 +435,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupEventListeners() {
-        // Обработчики для кнопок типов графиков
         document.querySelectorAll('.chart-type-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const chartName = this.dataset.chart;
                 const chartType = this.dataset.type;
 
-                // Обновляем активную кнопку
                 this.parentElement.querySelectorAll('.chart-type-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
 
-                // Перезагружаем график
                 loadChart(chartName, chartType);
             });
         });
 
-        // Обработчик для применения фильтров
         document.getElementById('apply-filters').addEventListener('click', function() {
             initializeCharts();
         });
@@ -464,34 +458,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (!canvas || !loading) return;
 
-        // Показываем загрузку
         canvas.style.display = 'none';
         loading.style.display = 'flex';
 
         try {
-            // Уничтожаем существующий график
             if (charts[chartName]) {
                 charts[chartName].destroy();
             }
 
-            // Получаем данные
             const data = await fetchChartData(chartName, chartType);
 
             if (data.success) {
-                // Проверяем, есть ли данные для отображения
                 if (data.data && (data.data.labels?.length > 0 || data.data.datasets?.some(d => d.data?.length > 0))) {
-                    // Создаем новый график
                     const ctx = canvas.getContext('2d');
                     charts[chartName] = new Chart(ctx, {
                         ...data.config,
                         data: data.data
                     });
 
-                    // Скрываем загрузку
                     loading.style.display = 'none';
                     canvas.style.display = 'block';
                 } else {
-                    // Нет данных для отображения
                     loading.innerHTML = '<div style="color: #999; text-align: center;"><div style="font-size: 3rem; margin-bottom: 10px;">📊</div><div>Нет данных для отображения</div><div style="font-size: 0.9rem; margin-top: 5px;">Создайте задачи с категориями и тегами</div></div>';
                 }
             } else {

@@ -113,7 +113,7 @@ class TaskLifecycleTest extends TestCase
     public function test_analytics_calculations_with_real_task_data(): void
     {
         $user = $this->authenticateUser();
-        $analyticsService = new TaskAnalyticsService();
+        $analyticsService = app(TaskAnalyticsService::class);
 
         // Создаем задачи с разными статусами и приоритетами
         $tasks = [
@@ -186,7 +186,6 @@ class TaskLifecycleTest extends TestCase
             'name' => 'Integration Test User',
             'email' => 'integration@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
         ]);
 
         $registerResponse->assertStatus(201);

@@ -980,7 +980,6 @@
         }, 2500);
     }
 
-    // Модальное окно для добавления задач
     document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('addTaskModal');
         const addTaskBtn = document.getElementById('addTaskBtn');
@@ -988,14 +987,12 @@
         const cancelBtn = document.getElementById('cancelBtn');
         const addTaskForm = document.getElementById('addTaskForm');
 
-        // Открытие модального окна
         addTaskBtn.addEventListener('click', function() {
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
             document.getElementById('taskTitle').focus();
         });
 
-        // Закрытие модального окна
         function closeModalWindow() {
             modal.classList.remove('show');
             document.body.style.overflow = '';
@@ -1005,28 +1002,24 @@
         closeModal.addEventListener('click', closeModalWindow);
         cancelBtn.addEventListener('click', closeModalWindow);
 
-        // Закрытие по клику вне модального окна
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModalWindow();
             }
         });
 
-        // Закрытие по Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.classList.contains('show')) {
                 closeModalWindow();
             }
         });
 
-        // Отправка формы
         addTaskForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const submitBtn = this.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             
-            // Показываем загрузку
             submitBtn.innerHTML = '<span class="btn-icon">⏳</span>Создание...';
             submitBtn.disabled = true;
 
@@ -1073,7 +1066,6 @@
                 console.error('Ошибка:', error);
                 showNotification(error.message || 'Не удалось создать задачу', 'error');
             } finally {
-                // Восстанавливаем кнопку
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }

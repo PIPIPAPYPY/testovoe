@@ -1,24 +1,25 @@
 FROM php:8.3-fpm
 
-WORKDIR "/application"
+WORKDIR /application
 
-RUN apt-get update
+# Устанавливаем пакеты
+RUN apt-get update && apt-get install -y \
+    git curl libpng-dev libonig-dev libxml2-dev \
+    libzip-dev libpq-dev zip unzip
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Устанавливаем расширения PHP
+RUN docker-php-ext-install pdo_pgsql pgsql mbstring gd zip
 
-# Install zip+icu dev libs + pgsql dev support
-RUN apt-get install libzip-dev zip libicu-dev libpq-dev -y
+# Устанавливаем Redis
+RUN pecl install redis && docker-php-ext-enable redis
 
-RUN apt-get update && apt-get install -y nano
+# Composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 
-# Install PHP extensions zip and intl (intl requires to be configured)
-RUN docker-php-ext-install zip && docker-php-ext-configure intl && docker-php-ext-install intl
+# Изменяем UID и GID пользователя www-data на 1000 (совместимость с Windows)
+RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
-# Add MySQL and Postgres/pgsql support
-RUN docker-php-ext-configure pgsql --with-pgsql=/usr/local/pgsql && docker-php-ext-install pdo_pgsql pgsql
+# Создаем директорию для Unix socket и меняем владельца
+RUN mkdir -p /var/run/php && chown www-data:www-data /var/run/php
 
-RUN apt-get update && \
-apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev && \
-docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ && \
-docker-php-ext-install gd
+CMD ["php-fpm", "-F", "-R"]

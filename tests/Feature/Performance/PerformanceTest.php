@@ -108,7 +108,9 @@ class PerformanceTest extends TestCase
         
         // Создаем мок для AnalyticsServiceInterface
         $analyticsService = $this->createMock(\App\Services\Analytics\AnalyticsServiceInterface::class);
-        $taskService = new \App\Services\TaskService($analyticsService);
+        $cacheService = app(\App\Services\Cache\CacheService::class);
+        $keyGenerator = app(\App\Services\Cache\CacheKeyGenerator::class);
+        $taskService = new \App\Services\TaskService($analyticsService, $cacheService, $keyGenerator);
         
         $startTime = microtime(true);
         

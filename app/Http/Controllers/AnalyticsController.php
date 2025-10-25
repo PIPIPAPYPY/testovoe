@@ -34,10 +34,8 @@ class AnalyticsController extends Controller
         $userId = Auth::id();
         $overallStats = $this->analyticsService->getOverallStats($userId);
         
-        // Временная отладка
         \Log::info('Analytics stats:', $overallStats);
         
-        // Если ключ отсутствует, добавляем его временно
         if (!array_key_exists('completed_last_30_days', $overallStats)) {
             $overallStats['completed_last_30_days'] = 0;
         }
@@ -269,7 +267,6 @@ class AnalyticsController extends Controller
         try {
             $userId = Auth::id();
             
-            // Пока возвращаем заглушку, так как категории не реализованы
             $data = [
                 ['category' => 'Работа', 'count' => 15],
                 ['category' => 'Личное', 'count' => 8],
@@ -307,7 +304,6 @@ class AnalyticsController extends Controller
         try {
             $userId = Auth::id();
             
-            // Пока возвращаем заглушку, так как теги не реализованы
             $data = [
                 ['tag' => 'срочно', 'count' => 12],
                 ['tag' => 'важно', 'count' => 9],
@@ -375,7 +371,6 @@ class AnalyticsController extends Controller
     public function getAvailableCategories(): JsonResponse
     {
         try {
-            // Пока возвращаем заглушку
             $categories = ['Работа', 'Личное', 'Учеба', 'Проекты', 'Встречи'];
 
             return response()->json([
@@ -398,7 +393,6 @@ class AnalyticsController extends Controller
     public function getAvailableTags(): JsonResponse
     {
         try {
-            // Пока возвращаем заглушку
             $tags = ['срочно', 'важно', 'проект', 'встреча', 'звонок', 'email', 'документы'];
 
             return response()->json([

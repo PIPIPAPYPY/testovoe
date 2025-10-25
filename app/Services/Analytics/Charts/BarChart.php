@@ -24,12 +24,10 @@ class BarChart implements ChartInterface
         $values = [];
 
         foreach ($data as $item) {
-            // Поддерживаем разные форматы данных
             $labels[] = $item['priority'] ?? $item['status'] ?? $item['day'] ?? $item['time_period'] ?? $item['period'] ?? '';
             $values[] = $item['count'] ?? 0;
         }
 
-        // Генерируем цвета для каждого столбца
         $colors = [
             'rgba(102, 126, 234, 0.8)', 'rgba(118, 75, 162, 0.8)', 'rgba(255, 159, 64, 0.8)',
             'rgba(75, 192, 192, 0.8)', 'rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)',

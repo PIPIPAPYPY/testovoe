@@ -13,8 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'compress' => \App\Http\Middleware\CompressionMiddleware::class,
+            'cache.api' => \App\Http\Middleware\CacheApiResponse::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
     })->create();

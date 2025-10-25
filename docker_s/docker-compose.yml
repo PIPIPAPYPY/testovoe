@@ -15,15 +15,18 @@ services:
   php-fpm:
     build: sourcefiles/php-fpm
     container_name: ${PROJECT_NAME}-php-fpm
-
     working_dir: /application
     environment:
       - PHP_WORKER_INSTALL_BCMATH=true
     volumes:
       - ./../:/application
       - ./sourcefiles/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+    depends_on:
+      - pgsql
+      - redis
     networks:
       - internal
+
   pgsql:
     image: postgres:13
     container_name: ${PROJECT_NAME}-pgsql
@@ -42,9 +45,24 @@ services:
     networks:
       - internal
 
+  redis:
+    image: redis:7-alpine
+    container_name: ${PROJECT_NAME}-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru --save "" --tcp-keepalive 60 --timeout 300
+    networks:
+      - internal
+    volumes:
+      - redis-data:/data
+    ports:
+      - "6379:6379"
+
 volumes:
   pg-data:
     driver: local
+  redis-data:
+    driver: local
+
 networks:
   internal:
     driver: bridge

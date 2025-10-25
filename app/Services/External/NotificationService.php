@@ -90,7 +90,6 @@ class NotificationService
                     return $result;
                 }
 
-                // Если ошибка 5xx, попробуем еще раз
                 if ($response->status() >= 500 && $attempt < $maxRetries) {
                     $waitTime = $attempt * 2; // Экспоненциальная задержка
                     Log::warning("Notification service retry attempt {$attempt}", [
@@ -102,7 +101,6 @@ class NotificationService
                     continue;
                 }
 
-                // Если это последняя попытка и ошибка 5xx, возвращаем "Max retries exceeded"
                 if ($response->status() >= 500 && $attempt >= $maxRetries) {
                     return [
                         'success' => false,

@@ -87,3 +87,4 @@ Route::post('/login', [WebAuthController::class, 'login'])->middleware(['web', '
  * Middleware: auth - проверка авторизации
  */
 Route::post('/logout', [WebAuthController::class, 'logout'])->middleware('auth')->name('logout');
+

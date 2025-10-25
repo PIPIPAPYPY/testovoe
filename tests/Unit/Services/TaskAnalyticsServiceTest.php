@@ -16,7 +16,7 @@ class TaskAnalyticsServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->analyticsService = new TaskAnalyticsService();
+        $this->analyticsService = app(TaskAnalyticsService::class);
         Cache::flush(); // Очищаем кэш перед каждым тестом
     }
 
@@ -232,18 +232,28 @@ class TaskAnalyticsServiceTest extends TestCase
         $this->analyticsService->getPriorityStats($user->id);
         $this->analyticsService->getOverallStats($user->id);
 
-        // Проверяем, что кэш заполнен
-        $this->assertTrue(Cache::has("analytics_completion_{$user->id}"));
-        $this->assertTrue(Cache::has("analytics_priorities_{$user->id}"));
-        $this->assertTrue(Cache::has("analytics_overall_{$user->id}"));
+        // Проверяем, что кэш заполнен, используя CacheService
+        $cacheService = app(\App\Services\Cache\CacheService::class);
+        $keyGenerator = app(\App\Services\Cache\CacheKeyGenerator::class);
+        
+        $completionKey = $keyGenerator->analytics($user->id, 'completion');
+        $prioritiesKey = $keyGenerator->analytics($user->id, 'priorities');
+        $overallKey = $keyGenerator->analytics($user->id, 'overall');
+        
+        // Для array драйвера проверяем без тегов
+        $tags = config('cache.default') === 'array' ? [] : $cacheService->getAnalyticsTags($user->id);
+        
+        $this->assertTrue($cacheService->has($completionKey, $tags));
+        $this->assertTrue($cacheService->has($prioritiesKey, $tags));
+        $this->assertTrue($cacheService->has($overallKey, $tags));
 
         // Очищаем кэш
         $this->analyticsService->clearUserAnalyticsCache($user->id);
 
         // Проверяем, что кэш очищен
-        $this->assertFalse(Cache::has("analytics_completion_{$user->id}"));
-        $this->assertFalse(Cache::has("analytics_priorities_{$user->id}"));
-        $this->assertFalse(Cache::has("analytics_overall_{$user->id}"));
+        $this->assertFalse($cacheService->has($completionKey, $tags));
+        $this->assertFalse($cacheService->has($prioritiesKey, $tags));
+        $this->assertFalse($cacheService->has($overallKey, $tags));
     }
 
     public function test_analytics_with_empty_dataset(): void

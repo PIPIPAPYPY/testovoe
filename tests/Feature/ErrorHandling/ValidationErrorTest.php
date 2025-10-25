@@ -14,7 +14,6 @@ class ValidationErrorTest extends TestCase
         $user = $this->authenticateUser();
         $invalidData = TestDataHelper::getInvalidTaskData();
 
-        // Тест пустого заголовка
         $response = $this->postJson('/api/tasks', $invalidData['empty_title']);
         $response->assertStatus(422)
                 ->assertJsonValidationErrors(['title']);
@@ -84,18 +83,16 @@ class ValidationErrorTest extends TestCase
             'name' => 'Test User',
             'email' => 'invalid-email',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
         ]);
 
         $response->assertStatus(422)
                 ->assertJsonValidationErrors(['email']);
 
-        // Тест регистрации с несовпадающими паролями
+        // Тест регистрации с коротким паролем
         $response = $this->postJson('/api/auth/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'different_password'
+            'password' => '123', // Слишком короткий пароль (минимум 8 символов)
         ]);
 
         $response->assertStatus(422)

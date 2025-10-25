@@ -82,7 +82,6 @@ class AuthenticationTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
         ];
 
         $response = $this->postJson('/api/auth/register', $userData);
@@ -113,7 +112,6 @@ class AuthenticationTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
         ];
 
         $response = $this->postJson('/api/auth/register', $userData);
@@ -127,7 +125,6 @@ class AuthenticationTest extends TestCase
         $response = $this->postJson('/api/auth/register', [
             'email' => 'test@example.com',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
         ]);
 
         $this->assertValidationError($response, ['name']);
@@ -136,7 +133,6 @@ class AuthenticationTest extends TestCase
         $response = $this->postJson('/api/auth/register', [
             'name' => 'Test User',
             'password' => 'password123',
-            'password_confirmation' => 'password123'
         ]);
 
         $this->assertValidationError($response, ['email']);
@@ -156,7 +152,6 @@ class AuthenticationTest extends TestCase
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => '123', // Слишком короткий пароль
-            'password_confirmation' => '123'
         ];
 
         $response = $this->postJson('/api/auth/register', $userData);

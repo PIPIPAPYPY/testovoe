@@ -4,7 +4,9 @@ namespace App\Observers;
 
 use App\Models\Task;
 use App\Services\Analytics\AnalyticsServiceInterface;
+use App\Services\Cache\CacheService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Observer для модели Task
@@ -14,6 +16,9 @@ use Illuminate\Support\Facades\Cache;
  */
 class TaskObserver
 {
+    public function __construct(
+        private CacheService $cacheService
+    ) {}
     /**
      * Обработка создания новой задачи
      */
@@ -29,7 +34,6 @@ class TaskObserver
      */
     public function updating(Task $task): void
     {
-        // Базовая логика обновления задач
     }
 
     /**
@@ -41,7 +45,6 @@ class TaskObserver
             $this->clearUserCaches($task->user_id);
         }
         
-        // Если изменился пользователь, очищаем кэш и для старого пользователя
         if ($task->wasChanged('user_id')) {
             $originalUserId = $task->getOriginal('user_id');
             if ($originalUserId) {
@@ -69,21 +72,21 @@ class TaskObserver
             return;
         }
         
-        // Очищаем кэш статистики задач
-        Cache::forget("user_{$userId}_task_counts");
-        
-        // Очищаем кэш аналитики
-        $analyticsKeys = [
-            "analytics_creation_{$userId}",
-            "analytics_completion_{$userId}",
-            "analytics_priorities_{$userId}",
-            "analytics_weekly_{$userId}",
-            "analytics_timeofday_{$userId}",
-            "analytics_overall_{$userId}",
-        ];
-
-        foreach ($analyticsKeys as $key) {
-            Cache::forget($key);
+        try {
+            $userTags = $this->cacheService->getUserTags($userId);
+            $this->cacheService->flushTags($userTags);
+            
+            $analyticsTags = $this->cacheService->getAnalyticsTags($userId);
+            $this->cacheService->flushTags($analyticsTags);
+            
+            $apiTags = $this->cacheService->getApiTags('*', $userId);
+            $this->cacheService->flushTags($apiTags);
+            
+        } catch (\Exception $e) {
+            Log::warning('Failed to clear user cache', [
+                'user_id' => $userId,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

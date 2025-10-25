@@ -61,8 +61,9 @@ Route::name('api.')->middleware('auth:sanctum')->group(function () {
      * - DELETE /api/tasks/{id} - удалить задачу
      * Доступно: только авторизованным пользователям
      * Пользователи видят только свои задачи (автоматическая фильтрация по user_id)
+     * Middleware: cache.api - кеширование API ответов
      */
-    Route::apiResource('tasks', TaskController::class);
+    Route::middleware('cache.api')->apiResource('tasks', TaskController::class);
 
     /**
      * API для аналитики задач пользователя
@@ -77,8 +78,9 @@ Route::name('api.')->middleware('auth:sanctum')->group(function () {
      * 
      * Доступно: только авторизованным пользователям
      * Данные фильтруются по текущему пользователю
+     * Middleware: cache.api - кеширование API ответов
      */
-    Route::prefix('analytics')->group(function () {
+    Route::prefix('analytics')->middleware('cache.api')->group(function () {
         Route::get('completed-tasks-chart', [App\Http\Controllers\AnalyticsController::class, 'getCompletedTasksChart']);
         Route::get('category-chart', [App\Http\Controllers\AnalyticsController::class, 'getCategoryChart']);
         Route::get('tag-chart', [App\Http\Controllers\AnalyticsController::class, 'getTagChart']);

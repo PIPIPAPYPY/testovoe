@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Task;
 use App\Services\Analytics\AnalyticsServiceInterface;
+use App\Services\Cache\CacheService;
+use App\Services\Cache\CacheKeyGenerator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -18,10 +20,10 @@ use Illuminate\Support\Facades\DB;
  */
 class TaskService
 {
-    private const CACHE_TTL = 300; // 5 минут
-    
     public function __construct(
-        private AnalyticsServiceInterface $analyticsService
+        private AnalyticsServiceInterface $analyticsService,
+        private CacheService $cacheService,
+        private CacheKeyGenerator $keyGenerator
     ) {}
 
     /**
@@ -32,11 +34,21 @@ class TaskService
         array $filters = [], 
         int $perPage = 12
     ): LengthAwarePaginator {
-        $query = $this->buildTaskQuery($userId, $filters);
+        $cacheKey = $this->keyGenerator->userTasks($userId, $filters);
+        $tags = $this->cacheService->getUserTags($userId);
         
-        return $query->orderBy('created_at', 'desc')
-                    ->paginate($perPage)
-                    ->appends($filters);
+        return $this->cacheService->remember(
+            $cacheKey,
+            function () use ($userId, $filters, $perPage) {
+                $query = $this->buildTaskQuery($userId, $filters);
+                
+                return $query->orderBy('created_at', 'desc')
+                            ->paginate($perPage)
+                            ->appends($filters);
+            },
+            $this->cacheService->getTtl('lists'),
+            $tags
+        );
     }
 
     /**
@@ -94,25 +106,31 @@ class TaskService
      */
     public function getStatusCounts(int $userId): array
     {
-        $cacheKey = "user_{$userId}_task_counts";
+        $cacheKey = $this->keyGenerator->taskStats($userId);
+        $tags = $this->cacheService->getUserTags($userId);
         
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($userId) {
-            $counts = Task::forUser($userId)
-                ->selectRaw('
-                    COUNT(*) as all_count,
-                    SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as todo_count,
-                    SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as in_progress_count,
-                    SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as done_count
-                ', ['todo', 'in_progress', 'done'])
-                ->first();
-            
-            return [
-                'all' => $counts->all_count,
-                'todo' => $counts->todo_count,
-                'in_progress' => $counts->in_progress_count,
-                'done' => $counts->done_count,
-            ];
-        });
+        return $this->cacheService->remember(
+            $cacheKey,
+            function () use ($userId) {
+                $counts = Task::forUser($userId)
+                    ->selectRaw('
+                        COUNT(*) as all_count,
+                        SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as todo_count,
+                        SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as in_progress_count,
+                        SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as done_count
+                    ', ['todo', 'in_progress', 'done'])
+                    ->first();
+                
+                return [
+                    'all' => $counts->all_count,
+                    'todo' => $counts->todo_count,
+                    'in_progress' => $counts->in_progress_count,
+                    'done' => $counts->done_count,
+                ];
+            },
+            $this->cacheService->getTtl('analytics'),
+            $tags
+        );
     }
 
     /**
@@ -175,7 +193,10 @@ class TaskService
      */
     private function clearUserCache(int $userId): void
     {
-        Cache::forget("user_{$userId}_task_counts");
-        $this->analyticsService->clearUserAnalyticsCache($userId);
+        $tags = $this->cacheService->getUserTags($userId);
+        $this->cacheService->flushTags($tags);
+        
+        $analyticsTags = $this->cacheService->getAnalyticsTags($userId);
+        $this->cacheService->flushTags($analyticsTags);
     }
 }

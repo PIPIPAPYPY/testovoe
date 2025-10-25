@@ -9,7 +9,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            // Проверяем и добавляем колонки только если их нет
             if (!Schema::hasColumn('tasks', 'completed_at')) {
                 $table->timestamp('completed_at')->nullable();
             }
@@ -27,7 +26,6 @@ return new class extends Migration
             }
         });
 
-        // Добавляем индексы отдельно
         try {
             Schema::table('tasks', function (Blueprint $table) {
                 $table->index(['user_id', 'completed_at'], 'idx_user_completed');
@@ -35,23 +33,19 @@ return new class extends Migration
                 $table->index(['user_id', 'status', 'completed_at'], 'idx_user_status_completed');
             });
         } catch (Exception $e) {
-            // Индексы уже существуют
         }
     }
 
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            // Удаляем индексы
             try {
                 $table->dropIndex('idx_user_completed');
                 $table->dropIndex('idx_user_category');
                 $table->dropIndex('idx_user_status_completed');
             } catch (Exception $e) {
-                // Индексы не существуют
             }
 
-            // Удаляем колонки
             $columns = ['time_spent', 'tags', 'category', 'completed_at'];
             foreach ($columns as $column) {
                 if (Schema::hasColumn('tasks', $column)) {

@@ -17,7 +17,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Регистрируем TaskService как singleton
         $this->app->singleton(\App\Services\TaskService::class);
     }
 
@@ -27,7 +26,37 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Регистрируем Observer для модели Task
         \App\Models\Task::observe(\App\Observers\TaskObserver::class);
+        
+        $this->checkRedisHealth();
+    }
+    
+    /**
+     * Проверка здоровья Redis соединения
+     * При недоступности Redis переключается на array драйвер
+     */
+    private function checkRedisHealth(): void
+    {
+        try {
+            if (config('cache.default') !== 'redis') {
+                return;
+            }
+            
+            \Illuminate\Support\Facades\Cache::connection('redis')->ping();
+            
+            \Illuminate\Support\Facades\Log::info('Redis connection is healthy');
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Redis connection failed, falling back to array driver', [
+                'error' => $e->getMessage(),
+                'fallback_driver' => 'array'
+            ]);
+            
+            config(['cache.default' => 'array']);
+            
+            if (function_exists('opcache_reset')) {
+                opcache_reset();
+            }
+        }
     }
 }

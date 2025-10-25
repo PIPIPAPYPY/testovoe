@@ -17,7 +17,6 @@ class TaskAnalyticsSeeder extends Seeder
      */
     public function run(): void
     {
-        // Найдем первого пользователя
         $user = User::first();
         if (!$user) {
             $this->command->error('Пользователь не найден. Сначала создайте пользователя.');
@@ -26,9 +25,7 @@ class TaskAnalyticsSeeder extends Seeder
 
         $this->command->info("Создаем тестовые данные для пользователя: {$user->name}");
 
-        // Создаем задачи с разными приоритетами и статусами
         $tasks = [
-            // Высокий приоритет
             [
                 'title' => ' Критическая ошибка в продакшене',
                 'description' => 'Необходимо срочно исправить ошибку, которая влияет на всех пользователей',
@@ -54,7 +51,6 @@ class TaskAnalyticsSeeder extends Seeder
                 'updated_at' => now()->subDays(1)->setHour(14),
             ],
 
-            // Средний приоритет
             [
                 'title' => ' Создание отчетов аналитики',
                 'description' => 'Разработать систему отчетов для менеджмента',
@@ -80,7 +76,6 @@ class TaskAnalyticsSeeder extends Seeder
                 'updated_at' => now()->subDays(2)->setHour(15),
             ],
 
-            // Низкий приоритет
             [
                 'title' => ' Обновление документации',
                 'description' => 'Привести в порядок техническую документацию',
@@ -106,7 +101,6 @@ class TaskAnalyticsSeeder extends Seeder
                 'updated_at' => now()->subHours(8)->setHour(20),
             ],
 
-            // Дополнительные задачи для разнообразия данных
             [
                 'title' => ' Настройка CI/CD пайплайна',
                 'description' => 'Автоматизировать процесс развертывания',
@@ -134,7 +128,6 @@ class TaskAnalyticsSeeder extends Seeder
         ];
 
         foreach ($tasks as $taskData) {
-            // Проверяем, не существует ли уже такая задача
             $existing = Task::where('title', $taskData['title'])
                           ->where('user_id', $user->id)
                           ->first();

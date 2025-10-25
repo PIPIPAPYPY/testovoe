@@ -501,8 +501,7 @@
                 body: JSON.stringify({ 
                     name: email.split('@')[0], 
                     email, 
-                    password,
-                    password_confirmation: password 
+                    password
                 })
             });
 
@@ -667,7 +666,6 @@
         }
     }
 
-    // Аналитика
     async function getOverallStats() {
         try {
             const response = await fetch('/api/analytics/overall-stats', {

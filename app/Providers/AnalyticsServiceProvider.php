@@ -18,7 +18,6 @@ class AnalyticsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Регистрируем интерфейс аналитики с его реализацией
         $this->app->bind(AnalyticsServiceInterface::class, TaskAnalyticsService::class);
     }
 
@@ -27,6 +26,5 @@ class AnalyticsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
     }
 }

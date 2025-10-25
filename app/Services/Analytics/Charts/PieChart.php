@@ -28,7 +28,6 @@ class PieChart implements ChartInterface
         $backgroundColors = [];
 
         foreach ($data as $index => $item) {
-            // Поддерживаем разные форматы данных
             $labels[] = $item['priority'] ?? $item['status'] ?? $item['day'] ?? $item['time_period'] ?? $item['category'] ?? $item['tag'] ?? 'Без категории';
             $values[] = $item['count'] ?? 0;
             $backgroundColors[] = $this->colors[$index % count($this->colors)];
