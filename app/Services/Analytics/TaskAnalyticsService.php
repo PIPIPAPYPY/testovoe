@@ -3,6 +3,7 @@
 namespace App\Services\Analytics;
 
 use App\Models\Task;
+use App\Models\User;
 use App\Services\Cache\CacheService;
 use App\Services\Cache\CacheKeyGenerator;
 use Illuminate\Support\Facades\Cache;
@@ -63,8 +64,11 @@ class TaskAnalyticsService implements AnalyticsServiceInterface
         return $this->cacheService->remember(
             $cacheKey,
             function () use ($userId) {
-                $completed = Task::forUser($userId)->where('status', 'done')->count();
-                $notCompleted = Task::forUser($userId)->whereIn('status', ['todo', 'in_progress'])->count();
+                $user = User::findOrFail($userId);
+                $tasks = $user->tasks;
+                
+                $completed = $tasks->where('status', 'done')->count();
+                $notCompleted = $tasks->whereIn('status', ['todo', 'in_progress'])->count();
                 
                 return [
                     ['status' => 'Выполненные', 'count' => $completed],
@@ -164,16 +168,21 @@ class TaskAnalyticsService implements AnalyticsServiceInterface
         return $this->cacheService->remember(
             $cacheKey,
             function () use ($userId) {
-                $totalTasks = Task::forUser($userId)->count();
-                $completedTasks = Task::forUser($userId)->where('status', 'done')->count();
-                $inProgressTasks = Task::forUser($userId)->where('status', 'in_progress')->count();
-                $todoTasks = Task::forUser($userId)->where('status', 'todo')->count();
+                $user = User::findOrFail($userId);
+                $tasks = $user->tasks;
+                
+                $totalTasks = $tasks->count();
+                $completedTasks = $tasks->where('status', 'done')->count();
+                $inProgressTasks = $tasks->where('status', 'in_progress')->count();
+                $todoTasks = $tasks->where('status', 'todo')->count();
                 
                 $completionRate = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100, 2) : 0;
                 
-                $completedLast30Days = Task::forUser($userId)
+                $completedLast30Days = $tasks
                     ->where('status', 'done')
-                    ->where('updated_at', '>=', now()->subDays(30))
+                    ->filter(function ($task) {
+                        return $task->updated_at && $task->updated_at->gte(now()->subDays(30));
+                    })
                     ->count();
                     
                 return [

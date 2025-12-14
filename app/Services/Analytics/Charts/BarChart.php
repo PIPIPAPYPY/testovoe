@@ -7,16 +7,11 @@ namespace App\Services\Analytics\Charts;
  */
 class BarChart implements ChartInterface
 {
-    private string $title;
-    private string $xAxisLabel;
-    private string $yAxisLabel;
-
-    public function __construct(string $title = 'Сравнение по категориям', string $xAxisLabel = 'Категории', string $yAxisLabel = 'Количество')
-    {
-        $this->title = $title;
-        $this->xAxisLabel = $xAxisLabel;
-        $this->yAxisLabel = $yAxisLabel;
-    }
+    public function __construct(
+        private string $title = 'Сравнение по категориям',
+        private string $xAxisLabel = 'Категории',
+        private string $yAxisLabel = 'Количество'
+    ) {}
 
     public function getData(array $data): array
     {

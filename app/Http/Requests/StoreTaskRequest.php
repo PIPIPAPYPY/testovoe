@@ -22,6 +22,11 @@ class StoreTaskRequest extends FormRequest
             'priority' => ['nullable', 'integer', 'in:1,2,3'],
             'status' => ['nullable', 'in:todo,in_progress,done'],
             'deadline' => ['nullable', 'date', 'after:now'],
+            'completed_at' => ['nullable', 'date'],
+            'category' => ['nullable', 'string', 'max:100'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['string', 'max:50'],
+            'time_spent' => ['nullable', 'integer', 'min:0'],
         ];
     }
 
@@ -35,6 +40,13 @@ class StoreTaskRequest extends FormRequest
             'status.in' => 'Недопустимый статус задачи.',
             'deadline.date' => 'Дедлайн должен быть корректной датой.',
             'deadline.after' => 'Дедлайн должен быть в будущем.',
+            'completed_at.date' => 'Дата завершения должна быть корректной датой.',
+            'category.max' => 'Категория не должна превышать 100 символов.',
+            'tags.array' => 'Теги должны быть массивом.',
+            'tags.*.string' => 'Каждый тег должен быть строкой.',
+            'tags.*.max' => 'Каждый тег не должен превышать 50 символов.',
+            'time_spent.integer' => 'Время должно быть целым числом.',
+            'time_spent.min' => 'Время не может быть отрицательным.',
         ];
     }
 }

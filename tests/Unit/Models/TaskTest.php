@@ -13,7 +13,18 @@ class TaskTest extends TestCase
     {
         $task = new Task();
         
-        $expectedFillable = ['title', 'description', 'status', 'user_id', 'priority', 'deadline'];
+        $expectedFillable = [
+            'title', 
+            'description', 
+            'status', 
+            'user_id', 
+            'priority', 
+            'deadline',
+            'completed_at',
+            'category',
+            'tags',
+            'time_spent'
+        ];
         
         $this->assertEquals($expectedFillable, $task->getFillable());
     }

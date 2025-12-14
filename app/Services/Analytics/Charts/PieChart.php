@@ -7,12 +7,11 @@ namespace App\Services\Analytics\Charts;
  */
 class PieChart implements ChartInterface
 {
-    private string $title;
     private array $colors;
 
-    public function __construct(string $title = 'Распределение задач')
-    {
-        $this->title = $title;
+    public function __construct(
+        private string $title = 'Распределение задач'
+    ) {
         $this->colors = [
             '#667eea', '#764ba2', '#f093fb', '#f5576c',
             '#4facfe', '#00f2fe', '#43e97b', '#38f9d7',

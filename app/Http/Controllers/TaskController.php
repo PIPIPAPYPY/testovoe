@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FilterTaskRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use App\Services\TaskService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,9 +28,9 @@ class TaskController extends Controller
     /**
      * Получить список задач пользователя
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(FilterTaskRequest $request): AnonymousResourceCollection
     {
-        $filters = $this->getValidatedFilters($request);
+        $filters = $request->validated();
         $tasks = $this->taskService->getUserTasks(Auth::id(), $filters, 50);
 
         return TaskResource::collection($tasks);
@@ -82,24 +82,6 @@ class TaskController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Задача успешно удалена'
-        ]);
-    }
-
-    /**
-     * Получить валидированные фильтры
-     */
-    private function getValidatedFilters(Request $request): array
-    {
-        return $request->validate([
-            'status' => 'nullable|in:todo,in_progress,done',
-            'priority' => 'nullable|integer|in:1,2,3',
-            'search' => 'nullable|string|max:255',
-            'created_from' => 'nullable|date',
-            'created_to' => 'nullable|date|after_or_equal:created_from',
-            'deadline_from' => 'nullable|date',
-            'deadline_to' => 'nullable|date|after_or_equal:deadline_from',
-            'sort_by' => 'nullable|in:created_at,deadline,priority,status',
-            'sort_dir' => 'nullable|in:asc,desc',
         ]);
     }
 }

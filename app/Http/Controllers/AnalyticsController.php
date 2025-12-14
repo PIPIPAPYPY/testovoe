@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\GetCompletedTasksChartRequest;
+use App\Http\Requests\GetCompletionChartRequest;
+use App\Http\Requests\GetPriorityChartRequest;
+use App\Http\Requests\GetTaskCreationChartRequest;
 use App\Services\Analytics\AnalyticsServiceInterface;
 use App\Services\Analytics\Charts\ChartFactory;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -17,12 +20,9 @@ use Illuminate\View\View;
  */
 class AnalyticsController extends Controller
 {
-    private AnalyticsServiceInterface $analyticsService;
-
-    public function __construct(AnalyticsServiceInterface $analyticsService)
-    {
-        $this->analyticsService = $analyticsService;
-    }
+    public function __construct(
+        private AnalyticsServiceInterface $analyticsService
+    ) {}
 
     /**
      * Отобразить страницу аналитики
@@ -46,17 +46,12 @@ class AnalyticsController extends Controller
     /**
      * Получить данные для графика создания задач
      * 
-     * @param Request $request
+     * @param GetTaskCreationChartRequest $request
      * @return JsonResponse
      */
-    public function getTaskCreationChart(Request $request): JsonResponse
+    public function getTaskCreationChart(GetTaskCreationChartRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'period' => 'nullable|in:day,week,month',
-                'chart_type' => 'nullable|in:line,bar'
-            ]);
-
             $userId = Auth::id();
             $period = $request->input('period', 'month');
             $chartType = $request->input('chart_type', 'line');
@@ -86,16 +81,12 @@ class AnalyticsController extends Controller
     /**
      * Получить данные для круговой диаграммы выполнения
      * 
-     * @param Request $request
+     * @param GetCompletionChartRequest $request
      * @return JsonResponse
      */
-    public function getCompletionChart(Request $request): JsonResponse
+    public function getCompletionChart(GetCompletionChartRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'chart_type' => 'nullable|in:pie,bar'
-            ]);
-
             $userId = Auth::id();
             $chartType = $request->input('chart_type', 'pie');
 
@@ -124,16 +115,12 @@ class AnalyticsController extends Controller
     /**
      * Получить данные для графика по приоритетам
      * 
-     * @param Request $request
+     * @param GetPriorityChartRequest $request
      * @return JsonResponse
      */
-    public function getPriorityChart(Request $request): JsonResponse
+    public function getPriorityChart(GetPriorityChartRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'chart_type' => 'nullable|in:pie,bar'
-            ]);
-
             $userId = Auth::id();
             $chartType = $request->input('chart_type', 'bar');
 
@@ -219,17 +206,12 @@ class AnalyticsController extends Controller
     /**
      * Получить данные для графика выполненных задач
      * 
-     * @param Request $request
+     * @param GetCompletedTasksChartRequest $request
      * @return JsonResponse
      */
-    public function getCompletedTasksChart(Request $request): JsonResponse
+    public function getCompletedTasksChart(GetCompletedTasksChartRequest $request): JsonResponse
     {
         try {
-            $request->validate([
-                'period' => 'nullable|in:day,week,month',
-                'chart_type' => 'nullable|in:line,bar'
-            ]);
-
             $userId = Auth::id();
             $period = $request->input('period', 'month');
             $chartType = $request->input('chart_type', 'line');

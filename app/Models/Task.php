@@ -17,6 +17,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $priority
  * @property int $user_id
  * @property \Carbon\Carbon|null $deadline
+ * @property \Carbon\Carbon|null $completed_at
+ * @property string|null $category
+ * @property array|null $tags
+ * @property int|null $time_spent
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
@@ -30,13 +34,20 @@ class Task extends Model
         'status', 
         'user_id', 
         'priority', 
-        'deadline'
+        'deadline',
+        'completed_at',
+        'category',
+        'tags',
+        'time_spent'
     ];
 
     protected $casts = [
         'deadline' => 'datetime',
+        'completed_at' => 'datetime',
         'priority' => 'integer',
         'user_id' => 'integer',
+        'time_spent' => 'integer',
+        'tags' => 'array',
     ];
 
     protected $attributes = [

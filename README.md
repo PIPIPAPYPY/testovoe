@@ -388,7 +388,7 @@ class Task extends Model {
 - **L3 Cache**: Database query cache для оптимизации запросов
 - **HTTP Cache**: ETag и Last-Modified для API ответов
 
-**2. Tag-based инвалидация:**
+**2. Очистка кеша по тегам:**
 ```php
 // Автоматическая очистка связанных данных
 $cacheService->remember($key, $callback, $ttl, ['user:123', 'tasks']);

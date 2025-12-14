@@ -85,7 +85,6 @@ class RedisConnectionTest extends TestCase
             $exists = Cache::has($key);
             $this->assertTrue($exists);
             
- из кеша
             $forgotten = Cache::forget($key);
             $this->assertTrue($forgotten);
             

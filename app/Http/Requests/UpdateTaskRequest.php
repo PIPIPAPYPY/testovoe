@@ -22,6 +22,11 @@ class UpdateTaskRequest extends FormRequest
             'priority' => ['sometimes', 'integer', 'in:1,2,3'],
             'status' => ['sometimes', 'in:todo,in_progress,done'],
             'deadline' => ['nullable', 'date'],
+            'completed_at' => ['nullable', 'date'],
+            'category' => ['nullable', 'string', 'max:100'],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['string', 'max:50'],
+            'time_spent' => ['nullable', 'integer', 'min:0'],
         ];
     }
 
@@ -34,6 +39,13 @@ class UpdateTaskRequest extends FormRequest
             'priority.in' => 'Приоритет должен быть от 1 до 3.',
             'status.in' => 'Недопустимый статус задачи.',
             'deadline.date' => 'Дедлайн должен быть корректной датой.',
+            'completed_at.date' => 'Дата завершения должна быть корректной датой.',
+            'category.max' => 'Категория не должна превышать 100 символов.',
+            'tags.array' => 'Теги должны быть массивом.',
+            'tags.*.string' => 'Каждый тег должен быть строкой.',
+            'tags.*.max' => 'Каждый тег не должен превышать 50 символов.',
+            'time_spent.integer' => 'Время должно быть целым числом.',
+            'time_spent.min' => 'Время не может быть отрицательным.',
         ];
     }
 }

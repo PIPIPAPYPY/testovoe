@@ -9,16 +9,10 @@ namespace App\Services\Cache;
  */
 class StaticCacheService
 {
-    private CacheService $cacheService;
-    private CacheKeyGenerator $keyGenerator;
-
     public function __construct(
-        CacheService $cacheService,
-        CacheKeyGenerator $keyGenerator
-    ) {
-        $this->cacheService = $cacheService;
-        $this->keyGenerator = $keyGenerator;
-    }
+        private CacheService $cacheService,
+        private CacheKeyGenerator $keyGenerator
+    ) {}
 
     /**
      * Получить статусы задач

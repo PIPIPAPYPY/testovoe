@@ -7,16 +7,11 @@ namespace App\Services\Analytics\Charts;
  */
 class LineChart implements ChartInterface
 {
-    private string $title;
-    private string $xAxisLabel;
-    private string $yAxisLabel;
-
-    public function __construct(string $title = 'Динамика выполнения задач', string $xAxisLabel = 'Период', string $yAxisLabel = 'Количество задач')
-    {
-        $this->title = $title;
-        $this->xAxisLabel = $xAxisLabel;
-        $this->yAxisLabel = $yAxisLabel;
-    }
+    public function __construct(
+        private string $title = 'Динамика выполнения задач',
+        private string $xAxisLabel = 'Период',
+        private string $yAxisLabel = 'Количество задач'
+    ) {}
 
     public function getData(array $data): array
     {

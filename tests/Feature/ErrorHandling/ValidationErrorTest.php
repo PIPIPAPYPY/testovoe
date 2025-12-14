@@ -273,7 +273,9 @@ class ValidationErrorTest extends TestCase
 
         $response->assertStatus(201);
         
-        $task = Task::latest()->first();
+        // Находим задачу по заголовку для надежности
+        $task = Task::where('title', $unicodeTitle)->where('user_id', $user->id)->first();
+        $this->assertNotNull($task, 'Unicode задача не найдена');
         $this->assertEquals($unicodeTitle, $task->title);
         $this->assertEquals($unicodeDescription, $task->description);
 
@@ -286,7 +288,9 @@ class ValidationErrorTest extends TestCase
 
         $response->assertStatus(201);
         
-        $task = Task::latest()->first();
+        // Находим задачу по заголовку для надежности
+        $task = Task::where('title', $specialTitle)->where('user_id', $user->id)->first();
+        $this->assertNotNull($task, 'Задача со специальными символами не найдена');
         $this->assertEquals($specialTitle, $task->title);
     }
 }
